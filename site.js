@@ -7,6 +7,8 @@
     if (saved === 'ko' || saved === 'en') lang = saved;
     else if (!(navigator.language || 'ko').toLowerCase().startsWith('ko')) lang = 'en';
   } catch (e) {}
+  // 언어 버튼이 없는 페이지(한국어 글)는 그 페이지 언어 그대로 둬요
+  if (!document.querySelector('[data-set-lang]')) lang = document.documentElement.lang || 'ko';
 
   function apply(l) {
     lang = l;

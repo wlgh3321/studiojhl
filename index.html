@@ -24,7 +24,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-  <link rel="stylesheet" href="/style.css?v=2">
+  <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body>
 
@@ -39,6 +39,9 @@
     </span>
     <span class="links">
       <a href="#about"><span data-only="ko">소개</span><span data-only="en" hidden>About</span></a>
+    </span>
+    <span class="links">
+      <a href="/blog/"><span data-only="ko">글</span><span data-only="en" hidden>Blog</span></a>
     </span>
     <span class="links">
       <a href="#contact"><span data-only="ko">문의</span><span data-only="en" hidden>Contact</span></a>
@@ -131,6 +134,19 @@
     </div>
   </section>
 
+  <section class="wrap section" id="blog" aria-labelledby="blogTitle">
+    <div class="section-head">
+      <span class="stage">READ</span>
+      <h2 id="blogTitle"><span data-only="ko">최근 글</span><span data-only="en" hidden>Latest posts (Korean)</span></h2>
+    </div>
+    <div class="posts">
+      <a class="box post-card" href="/blog/mental-math-tricks.html"><span class="tag tip">암산 요령</span><h3>계산이 빨라지는 암산 요령 5가지</h3><p>10 만들기, 거꾸로 더하기, 앞자리부터 계산하기까지 바로 써먹는 요령이에요.</p></a>
+      <a class="box post-card" href="/blog/everyday-math.html"><span class="tag life">생활 계산</span><h3>장 보고, 나눠 내고, 할인받을 때 쓰는 생활 계산 요령</h3><p>할인, 더치페이, 부가세를 계산기 없이 빠르게 해요.</p></a>
+      <a class="box post-card" href="/blog/devlog-sumsum.html"><span class="tag log">개발 일지</span><h3>개발 일지: 셈셈 놀이터를 만들며 고민한 것들</h3><p>게임 6가지와 난이도를 맞춘 과정을 기록했어요.</p></a>
+    </div>
+    <p style="margin:20px 0 0"><a class="btn ghost" href="/blog/"><span data-only="ko">글 전체 보기</span><span data-only="en" hidden>All posts</span></a></p>
+  </section>
+
   <section class="wrap section" id="contact" aria-labelledby="contactTitle">
     <div class="section-head">
       <span class="stage">CONTINUE?</span>
@@ -150,12 +166,13 @@
 <footer class="wrap foot">
   <span>© 2026 JHL STUDIO</span>
   <nav>
+    <a href="/blog/"><span data-only="ko">글</span><span data-only="en" hidden>Blog</span></a>
     <a href="/privacy.html"><span data-only="ko">개인정보처리방침</span><span data-only="en" hidden>Privacy</span></a>
     <a href="https://sumsum.studiojhl.com/"><span data-only="ko">셈셈 놀이터</span><span data-only="en" hidden>SumSum Playground</span></a>
   </nav>
 </footer>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script src="/site.js?v=1"></script>
+<script src="/site.js?v=2"></script>
 </body>
 </html>

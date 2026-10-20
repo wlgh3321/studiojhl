@@ -363,3 +363,62 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 }
 
 .hero p { max-width: none; }
+
+/* ---------- 글(블로그) ---------- */
+.crumb { display: inline-block; margin-bottom: 14px; font-weight: 700; font-size: 15px; text-decoration: none; }
+.crumb:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+
+.posts { display: grid; gap: 18px; }
+.post-card {
+  display: block;
+  padding: 20px 22px;
+  text-decoration: none;
+  transition: transform 0.06s, box-shadow 0.06s;
+}
+.post-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--ink); }
+.post-card h3 { margin: 8px 0 6px; font-size: 20px; line-height: 1.4; }
+.post-card p { margin: 0; color: var(--dim); font-size: 15px; }
+.post-card .tag { display: inline-block; }
+.tag.tip { background: var(--mint); }
+.tag.life { background: var(--yellow); }
+.tag.log { background: var(--purple); color: var(--paper); }
+
+.post { line-height: 1.8; }
+.post h1 { line-height: 1.35; margin-top: 10px; }
+.post h2 {
+  margin: 34px 0 10px;
+  padding-left: 12px;
+  border-left: 6px solid var(--red);
+  font-size: 21px;
+  line-height: 1.4;
+}
+.post p { margin: 0 0 14px; }
+.post ul, .post ol { margin: 0 0 14px; padding-left: 1.3em; }
+.post li { margin-bottom: 6px; }
+.post .lead { font-size: 18px; color: var(--ink); }
+.eg {
+  margin: 12px 0 16px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 3px solid var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.eg b { color: var(--red); }
+.eg p { margin: 0 0 6px; }
+.eg p:last-child { margin: 0; }
+.cta {
+  margin-top: 30px;
+  padding: 20px;
+  background: var(--yellow);
+  border: 3px solid var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.cta p { margin: 0; font-weight: 700; }
+.cta .btn { background: var(--paper); }
+.more { margin-top: 26px; }
+.more h2 { border-left-color: var(--blue); }
+.more a { font-weight: 700; }
