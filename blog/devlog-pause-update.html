@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5ff">
+  <title>개발 일지: 일시정지 버튼과 난이도를 다시 맞춘 이야기 · JHL STUDIO</title>
+  <meta name="description" content="셈셈 놀이터에 일시정지 버튼을 넣고, 시간 버티기 난이도와 휴대폰 화면의 문제 비를 고친 과정을 기록했어요.">
+  <link rel="alternate" type="application/rss+xml" title="JHL STUDIO 글" href="https://studiojhl.com/rss.xml">
+  <link rel="canonical" href="https://studiojhl.com/blog/devlog-pause-update.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="JHL STUDIO">
+  <meta property="og:title" content="개발 일지: 일시정지 버튼과 난이도를 다시 맞춘 이야기">
+  <meta property="og:description" content="셈셈 놀이터에 일시정지 버튼을 넣고, 시간 버티기 난이도와 휴대폰 화면의 문제 비를 고친 과정을 기록했어요.">
+  <meta property="og:url" content="https://studiojhl.com/blog/devlog-pause-update.html">
+  <meta property="og:image" content="https://studiojhl.com/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="/style.css?v=4">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "개발 일지: 일시정지 버튼과 난이도를 다시 맞춘 이야기", "description": "셈셈 놀이터에 일시정지 버튼을 넣고, 시간 버티기 난이도와 휴대폰 화면의 문제 비를 고친 과정을 기록했어요.", "datePublished": "2026-10-21", "inLanguage": "ko", "author": {"@type": "Organization", "name": "JHL STUDIO"}, "publisher": {"@type": "Organization", "name": "JHL STUDIO"}, "mainEntityOfPage": "https://studiojhl.com/blog/devlog-pause-update.html"}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6048734887508367" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="/" aria-label="JHL STUDIO 홈">
+    <img class="brand-mark" src="/logo.svg" alt="" width="44" height="44">
+    <span class="brand-name">JHL STUDIO</span>
+  </a>
+  <nav class="nav">
+    <a href="/blog/">글</a>
+    <a href="https://sumsum.studiojhl.com/">셈셈 놀이터</a>
+  </nav>
+</header>
+<main class="wrap">
+  <div class="doc">
+    <a class="crumb" href="/blog/">◀ 글 목록</a>
+    <article class="box post">
+      <span class="tag log">개발 일지</span>
+      <h1>개발 일지: 일시정지 버튼과 난이도를 다시 맞춘 이야기</h1>
+      <p class="meta">2026.10.21 · JHL STUDIO</p>
+      <p class="lead">셈셈 놀이터를 공개하고 이틀 동안 친구들과 플레이어들에게 피드백을 정말 많이 받았어요. 그중 바로 고친 세 가지를 기록해 둘게요.</p>
+
+      <h2>1. 일시정지 버튼이 생겼어요</h2>
+      <p>"게임하다가 전화 오면 어떡해?"라는 말을 듣고 아차 싶었어요. 그동안 게임 중에는 "그만하기" 버튼만 있었거든요. 이제 그 자리에 <b>일시정지</b> 버튼이 있어요. 누르면 세 가지를 고를 수 있어요.</p>
+      <ul>
+        <li><b>계속하기</b>: 멈춘 곳에서 이어서 해요.</li>
+        <li><b>처음부터 다시</b>: 같은 설정으로 새로 시작해요.</li>
+        <li><b>그만하기</b>: 게임을 끝내요.</li>
+      </ul>
+      <p>일시정지하면 시간과 문제가 모두 멈추고, 문제는 화면에서 가려져요. 멈춘 채로 답을 생각할 수 있으면 랭킹전이 공정하지 않으니까요. 다른 앱으로 넘어가거나 화면이 꺼지면 저절로 일시정지돼요.</p>
+
+      <h2>2. 시간 버티기를 조금 쉽게</h2>
+      <p>"시간 버티기가 갑자기 너무 어려워진다"는 이야기가 많았어요. 숫자를 보니 맞을 만했어요. 맞혀서 얻는 시간은 빠르게 줄고, 시간이 흐르는 속도는 빠르게 늘어서, 어느 순간부터는 아무리 잘해도 버틸 수가 없었어요.</p>
+      <p>그래서 두 가지를 바꿨어요.</p>
+      <ul>
+        <li>맞히면 얻는 시간: 2초에서 시작해 천천히 줄고, 최소 <b>1초</b>까지만 줄어요.</li>
+        <li>시간이 흐르는 속도: 천천히 빨라지고, 최대 <b>2배</b>까지만 빨라져요.</li>
+      </ul>
+      <p>틀리면 3초가 깎이는 규칙은 그대로예요. 아무 답이나 빠르게 누르는 꼼수는 여전히 손해예요.</p>
+
+      <h2>3. 휴대폰에서 문제 비가 덜 빽빽하게</h2>
+      <p>아이폰으로 문제 비를 하면 문제 카드가 화면을 꽉 채우고 서로 겹쳐서 잘 안 보였어요. 컴퓨터 화면에 맞춰 크기를 정했던 게 문제였어요.</p>
+      <ul>
+        <li>떨어지는 카드에서 "= ?"를 빼서 폭을 줄였어요. 어차피 답을 쓰는 문제라는 건 다 아니까요.</li>
+        <li>휴대폰처럼 좁은 화면에서는 글자와 여백을 작게 했어요.</li>
+        <li>새 문제가 위에 있는 문제와 겹칠 자리밖에 없으면, 잠깐 기다렸다가 빈자리가 생기면 내려보내요.</li>
+      </ul>
+
+      <h2>피드백은 언제나 환영이에요</h2>
+      <p>이번에 고친 건 전부 직접 해 본 분들이 알려 준 것들이에요. 혼자 만들면 내 화면, 내 실력에 맞춰 버리기 쉬워서 이런 이야기가 정말 소중해요. 불편한 점이나 아이디어가 있으면 <a href="mailto:jhl.studio.00@gmail.com">jhl.studio.00@gmail.com</a>으로 언제든 보내 주세요.</p>
+      <div class="cta">
+        <p>셈셈 놀이터를 직접 해 보세요. 1분이면 한 판이에요.</p>
+        <a class="btn" href="https://sumsum.studiojhl.com/">▶ 셈셈 놀이터 하러 가기</a>
+      </div>
+      <div class="more">
+        <h2>함께 읽어 보세요</h2>
+        <ul>
+        <li><a href="/blog/devlog-hall-of-fame.html">개발 일지: 공정한 명예의 전당을 만드는 법</a></li>
+        <li><a href="/blog/big-numbers.html">million, billion을 억과 조로 바로 바꾸는 법</a></li>
+        <li><a href="/blog/average-tricks.html">평균, 머릿속에서 빠르게 구하는 법</a></li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="wrap foot">
+  <span>© 2026 JHL STUDIO</span>
+  <nav>
+    <a href="/">홈</a>
+    <a href="/blog/">글</a>
+    <a href="/privacy.html">개인정보처리방침</a>
+  </nav>
+</footer>
+<script src="/site.js?v=2"></script>
+</body>
+</html>

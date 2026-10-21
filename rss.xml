@@ -6,6 +6,27 @@
   <description>암산 요령, 생활 속 계산, 게임 개발 일지</description>
   <language>ko</language>
   <item>
+    <title>개발 일지: 일시정지 버튼과 난이도를 다시 맞춘 이야기</title>
+    <link>https://studiojhl.com/blog/devlog-pause-update.html</link>
+    <guid>https://studiojhl.com/blog/devlog-pause-update.html</guid>
+    <description>셈셈 놀이터에 일시정지 버튼을 넣고, 시간 버티기 난이도와 휴대폰 화면의 문제 비를 고친 과정을 기록했어요.</description>
+    <pubDate>Wed, 21 Oct 2026 09:00:00 +0900</pubDate>
+  </item>
+  <item>
+    <title>million, billion을 억과 조로 바로 바꾸는 법</title>
+    <link>https://studiojhl.com/blog/big-numbers.html</link>
+    <guid>https://studiojhl.com/blog/big-numbers.html</guid>
+    <description>영어 큰 수(thousand, million, billion, trillion)를 만, 억, 조로 빠르게 바꾸는 기준과 쉼표로 읽는 요령을 정리했어요.</description>
+    <pubDate>Wed, 21 Oct 2026 09:00:00 +0900</pubDate>
+  </item>
+  <item>
+    <title>평균, 머릿속에서 빠르게 구하는 법</title>
+    <link>https://studiojhl.com/blog/average-tricks.html</link>
+    <guid>https://studiojhl.com/blog/average-tricks.html</guid>
+    <description>기준값을 정하고 차이만 더하는 평균 계산, 두 그룹 평균 합치기, 목표 평균까지 필요한 점수, 평균과 중앙값의 차이를 정리했어요.</description>
+    <pubDate>Wed, 21 Oct 2026 09:00:00 +0900</pubDate>
+  </item>
+  <item>
     <title>어른도 헷갈리는 7단·8단·9단, 바로 떠올리는 요령</title>
     <link>https://studiojhl.com/blog/times-tables-tricks.html</link>
     <guid>https://studiojhl.com/blog/times-tables-tricks.html</guid>
