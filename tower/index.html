@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#f3f5ff">
+  <title>텐 타워 · 숫자를 이어 10을 만들어요 | JHL STUDIO</title>
+  <meta name="description" content="이웃한 숫자를 이어서 합 10을 만들면 펑! 올라오는 숫자 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요. 설치 없이 바로 하는 무료 웹게임.">
+  <link rel="canonical" href="https://studiojhl.com/tower/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="JHL STUDIO">
+  <meta property="og:title" content="텐 타워 · 숫자를 이어 10을 만들어요">
+  <meta property="og:description" content="이웃한 숫자를 이어서 합 10을 만들면 펑! 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요.">
+  <meta property="og:url" content="https://studiojhl.com/tower/">
+  <meta property="og:image" content="https://studiojhl.com/tower/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+  <link rel="stylesheet" href="tower.css?v=1">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6048734887508367" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<!-- ===== 첫 화면 ===== -->
+<section id="title" class="screen active">
+  <div class="top-bar">
+    <a class="back" href="/" data-t="studio">◀ JHL STUDIO</a>
+    <div class="top-btns">
+      <button type="button" class="chip" id="soundBtn" aria-pressed="true">♪ ON</button>
+      <button type="button" class="chip" id="langBtn">EN</button>
+    </div>
+  </div>
+
+  <div class="logo-wrap">
+    <div class="logo-blocks" aria-hidden="true">
+      <i class="b n4">4</i><i class="b n6">6</i><i class="b n3">3</i><i class="b n7">7</i>
+    </div>
+    <h1 class="logo">TEN<br>TOWER</h1>
+    <p class="logo-ko" data-t="nameKo">텐 타워</p>
+  </div>
+
+  <div class="card rule-card">
+    <p class="rule-big" data-t="rule1">이웃한 숫자를 이어서 <b>합 10</b>을 만들면 펑!</p>
+    <p class="rule-small" data-t="rule2">탑이 꼭대기에 닿으면 끝나요. 길게 이을수록 점수가 커져요.</p>
+    <div class="demo" aria-hidden="true">
+      <i class="b n2 on">2</i><i class="b n3 on">3</i><i class="b n5 on">5</i><span class="demo-eq">= 10 ✨</span>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-start" id="startBtn">▶ <span data-t="start">게임 시작</span></button>
+  <p class="best-line"><span data-t="myBest">내 최고 기록</span> <b id="titleBest">0</b></p>
+
+  <div class="card hof">
+    <div class="hof-head">
+      <span class="stage">HALL OF FAME</span>
+      <span class="hof-title" data-t="hof">명예의 전당</span>
+    </div>
+    <ol class="hof-list" id="hofList"><li class="hof-msg" data-t="loading">불러오는 중…</li></ol>
+  </div>
+
+  <footer class="foot">
+    <a href="/">JHL STUDIO</a>
+    <a href="https://sumsum.studiojhl.com/" data-t="sumsum">셈셈 놀이터</a>
+    <a href="/privacy.html" data-t="privacy">개인정보처리방침</a>
+  </footer>
+</section>
+
+<!-- ===== 게임 ===== -->
+<section id="game" class="screen">
+  <div class="hud">
+    <button type="button" class="btn btn-pause" id="pauseBtn" aria-label="일시정지">Ⅱ</button>
+    <div class="hud-box"><span class="hud-k" data-t="score">점수</span><b id="hudScore">0</b></div>
+    <div class="hud-box"><span class="hud-k" data-t="level">레벨</span><b id="hudLevel">1</b></div>
+    <div class="hud-box"><span class="hud-k" data-t="best">최고</span><b id="hudBest">0</b></div>
+  </div>
+
+  <div class="rise">
+    <div class="rise-bar"><i id="riseFill"></i></div>
+    <button type="button" class="btn btn-up" id="upBtn" aria-label="한 줄 올리기">▲ UP</button>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board" aria-label="숫자 판"></div>
+    <div class="sum-bubble" id="sumBubble" hidden></div>
+  </div>
+
+  <p class="hint" id="hint" data-t="hint">손가락으로 숫자를 이어 그어 보세요</p>
+</section>
+
+<!-- ===== 일시정지 ===== -->
+<div id="pauseBox" class="modal" hidden>
+  <div class="card modal-card" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="pause-title" id="pauseTitle">PAUSE</div>
+    <p class="modal-note" data-t="pauseNote">시간이 멈췄어요. 준비되면 계속하세요.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-start" id="resumeBtn" data-t="resume">계속하기</button>
+      <button type="button" class="btn" id="restartBtn" data-t="restart">처음부터 다시</button>
+      <button type="button" class="btn btn-ghost" id="quitBtn" data-t="quit">그만하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 게임 끝 ===== -->
+<div id="overBox" class="modal" hidden>
+  <div class="card modal-card over-card" role="dialog" aria-modal="true" aria-labelledby="overTitle">
+    <div class="over-title" id="overTitle">GAME OVER</div>
+    <div class="over-score" id="overScore">0</div>
+    <div class="over-badge" id="overBadge" hidden></div>
+    <div class="over-stats">
+      <div><span data-t="pops">터뜨린 횟수</span><b id="stPops">0</b></div>
+      <div><span data-t="chain">최장 연결</span><b id="stChain">0</b></div>
+      <div><span data-t="combo">최대 콤보</span><b id="stCombo">0</b></div>
+    </div>
+
+    <form class="rank-form" id="rankForm" hidden>
+      <p class="rank-msg" id="rankMsg" data-t="rankEnter">TOP 10 진입! 이름을 남겨 주세요</p>
+      <div class="rank-row">
+        <input type="text" id="rankName" maxlength="8" autocomplete="nickname" data-t-ph="rankPh" placeholder="닉네임 (8글자까지)">
+        <button type="submit" class="btn" id="rankSave" data-t="save">등록</button>
+      </div>
+      <p class="rank-hint" id="rankHint" data-t="rankHint">실명 대신 닉네임을 써 주세요. 모두에게 보여요.</p>
+    </form>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-start" id="againBtn" data-t="again">다시 하기</button>
+      <button type="button" class="btn" id="shareBtn" data-t="share">점수 자랑하기</button>
+      <button type="button" class="btn btn-ghost" id="homeBtn" data-t="home">처음 화면</button>
+    </div>
+  </div>
+</div>
+
+<div id="countdown" class="countdown" hidden><span id="countNum">3</span></div>
+<div id="fx" class="fx"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script src="tower.js?v=1"></script>
+</body>
+</html>
