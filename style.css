@@ -423,3 +423,9 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .more h2 { border-left-color: var(--blue); }
 .more a { font-weight: 700; }
 .tag.guide { background: var(--blue); color: var(--paper); }
+
+/* 프로젝트 카드: 플레이 버튼 옆 다른 곳 링크 */
+.project-links { margin-top: auto; display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; }
+.project-links .btn { margin-top: 0; }
+.store-link { font-weight: 700; font-size: 14px; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.store-link:hover { color: var(--red); }
