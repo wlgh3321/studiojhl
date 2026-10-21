@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5ff">
+  <title>틀린 답을 1초 만에 알아채는 어림셈과 검산 · JHL STUDIO</title>
+  <meta name="description" content="반올림 어림, 0의 개수 세기, 끝자리 확인, 9로 검산하기(구거법)까지 계산 실수를 빠르게 잡는 방법이에요.">
+  <link rel="canonical" href="https://studiojhl.com/blog/estimation-checking.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="JHL STUDIO">
+  <meta property="og:title" content="틀린 답을 1초 만에 알아채는 어림셈과 검산">
+  <meta property="og:description" content="반올림 어림, 0의 개수 세기, 끝자리 확인, 9로 검산하기(구거법)까지 계산 실수를 빠르게 잡는 방법이에요.">
+  <meta property="og:url" content="https://studiojhl.com/blog/estimation-checking.html">
+  <meta property="og:image" content="https://studiojhl.com/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="/style.css?v=4">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "틀린 답을 1초 만에 알아채는 어림셈과 검산", "description": "반올림 어림, 0의 개수 세기, 끝자리 확인, 9로 검산하기(구거법)까지 계산 실수를 빠르게 잡는 방법이에요.", "datePublished": "2026-10-21", "inLanguage": "ko", "author": {"@type": "Organization", "name": "JHL STUDIO"}, "publisher": {"@type": "Organization", "name": "JHL STUDIO"}, "mainEntityOfPage": "https://studiojhl.com/blog/estimation-checking.html"}</script>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="/" aria-label="JHL STUDIO 홈">
+    <img class="brand-mark" src="/logo.svg" alt="" width="44" height="44">
+    <span class="brand-name">JHL STUDIO</span>
+  </a>
+  <nav class="nav">
+    <a href="/blog/">글</a>
+    <a href="https://sumsum.studiojhl.com/">셈셈 놀이터</a>
+  </nav>
+</header>
+<main class="wrap">
+  <div class="doc">
+    <a class="crumb" href="/blog/">◀ 글 목록</a>
+    <article class="box post">
+      <span class="tag tip">암산 요령</span>
+      <h1>틀린 답을 1초 만에 알아채는 어림셈과 검산</h1>
+      <p class="meta">2026.10.21 · JHL STUDIO</p>
+      <p class="lead">계산을 빨리 하는 것만큼 중요한 게 있어요. 틀린 답을 알아채는 힘이에요. 정확한 답을 몰라도 "이건 이상한데?" 하고 느낄 수 있다면, 영수증 실수나 보고서의 숫자 오타를 그 자리에서 잡을 수 있어요.</p>
+
+      <h2>1. 반올림해서 대충 맞혀 봐요</h2>
+      <p>어림셈의 기본은 계산하기 쉬운 수로 바꾸는 거예요. 정확한 답 대신 크기를 먼저 확인하는 거죠.</p>
+      <div class="eg">
+        <p>4,870 + 3,120 + 2,960</p>
+        <p>→ 약 5,000 + 3,000 + 3,000 = 약 11,000</p>
+        <p>→ 실제 답 <b>10,950</b>. 거의 맞아요.</p>
+      </div>
+      <p>만약 계산 결과가 9,950이나 109,500으로 나왔다면, 어림한 11,000과 너무 달라서 바로 틀렸다는 걸 알 수 있어요.</p>
+
+      <h2>2. 0의 개수부터 세요</h2>
+      <p>큰 수를 곱할 때 가장 흔한 실수는 자릿수를 잘못 쓰는 거예요. 0이 아닌 부분만 곱하고, 0의 개수는 따로 세서 붙이세요.</p>
+      <div class="eg">
+        <p>300 × 40 → 3 × 4 = 12, 0이 세 개 → <b>12,000</b></p>
+        <p>2,500 × 400 → 25 × 4 = 100, 0이 네 개 → <b>1,000,000</b></p>
+      </div>
+
+      <h2>3. 끝자리만 따로 확인해요</h2>
+      <p>곱셈 결과의 일의 자리는 두 수의 일의 자리만 곱해 보면 알 수 있어요.</p>
+      <div class="eg">
+        <p>37 × 48의 끝자리 → 7 × 8 = 56 → 끝자리는 <b>6</b></p>
+        <p>계산한 답이 1,774라면? 끝자리가 4라서 틀렸어요. (정답 1,776)</p>
+      </div>
+      <p>홀짝도 같은 방식으로 확인할 수 있어요. 짝수가 하나라도 곱해지면 결과는 반드시 짝수예요.</p>
+
+      <h2>4. 9로 확인하기 (구거법)</h2>
+      <p>오래전부터 쓰인 검산법이에요. 각 자리 숫자를 계속 더해서 한 자리로 만든 뒤(9는 0으로 봐요), 그 값끼리 같은 계산을 해서 결과가 맞는지 비교해요.</p>
+      <div class="eg">
+        <p>347 + 586 = 933 이 맞을까요?</p>
+        <p>→ 347: 3 + 4 + 7 = 14 → 1 + 4 = 5</p>
+        <p>→ 586: 5 + 8 + 6 = 19 → 1 + 9 = 10 → 1</p>
+        <p>→ 5 + 1 = 6</p>
+        <p>→ 933: 9 + 3 + 3 = 15 → 6. <b>같으니까 통과!</b></p>
+      </div>
+      <p>곱셈에도 써요. 23 × 47 = 1081이라면, 23은 5, 47은 11에서 2, 5 × 2 = 10에서 1이에요. 1081도 1 + 0 + 8 + 1 = 10에서 1이라 통과예요.</p>
+      <p>다만 숫자 두 개의 순서가 바뀐 실수(1081을 1801로 쓴 경우)는 이 방법으로 못 잡아요. 그래서 어림셈과 함께 쓰는 게 좋아요.</p>
+
+      <h2>생활에서 써먹는 순서</h2>
+      <ol>
+        <li>계산하기 전에 대략 얼마쯤 나올지 먼저 어림해요.</li>
+        <li>계산한 뒤 어림값과 크기가 비슷한지 봐요.</li>
+        <li>중요한 숫자라면 끝자리나 9로 한 번 더 확인해요.</li>
+      </ol>
+      <p>이 습관이 붙으면 계산기를 쓸 때도 도움이 돼요. 키를 잘못 눌러서 엉뚱한 답이 나와도 바로 눈치챌 수 있거든요.</p>
+      <div class="cta">
+        <p>배운 요령, 바로 써 볼까요? 1분이면 한 판이에요.</p>
+        <a class="btn" href="https://sumsum.studiojhl.com/">▶ 셈셈 놀이터 하러 가기</a>
+      </div>
+      <div class="more">
+        <h2>함께 읽어 보세요</h2>
+        <ul>
+        <li><a href="/blog/divisibility-percent.html">나누어떨어지는지 1초 만에 알아보는 법, 그리고 분수와 퍼센트</a></li>
+        <li><a href="/blog/devlog-hall-of-fame.html">개발 일지: 공정한 명예의 전당을 만드는 법</a></li>
+        <li><a href="/blog/devlog-retro-design.html">개발 일지: 셈셈 놀이터가 레트로 오락실이 된 이유</a></li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="wrap foot">
+  <span>© 2026 JHL STUDIO</span>
+  <nav>
+    <a href="/">홈</a>
+    <a href="/blog/">글</a>
+    <a href="/privacy.html">개인정보처리방침</a>
+  </nav>
+</footer>
+<script src="/site.js?v=2"></script>
+</body>
+</html>

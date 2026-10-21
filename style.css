@@ -422,3 +422,4 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .more { margin-top: 26px; }
 .more h2 { border-left-color: var(--blue); }
 .more a { font-weight: 700; }
+.tag.guide { background: var(--blue); color: var(--paper); }
