@@ -144,7 +144,8 @@ p { text-wrap: pretty; }
 .specs { list-style: none; margin: 6px 0 4px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
 .specs b { display: block; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
 .specs span { font-size: 13px; color: var(--faint); }
-.game-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.game-links { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 6px; }
+@media (min-width: 480px) { .game-links { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 440px; } }
 .text-links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
 .text-links a, .store-link { font-weight: 600; color: var(--dim); text-decoration: underline; text-decoration-color: #c9c7bf; text-underline-offset: 4px; }
 .text-links a:hover, .store-link:hover { color: var(--ink); text-decoration-color: var(--ink); }

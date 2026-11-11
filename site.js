@@ -45,6 +45,15 @@
     }
   });
 
+  // 안드로이드는 아직 앱이 없어서, 강조 버튼을 "웹에서 하기" 쪽으로 바꿔요
+  if (/Android/i.test(navigator.userAgent)) document.querySelectorAll('[data-cta-pair]').forEach(g => {
+    const a = g.querySelector('[data-cta="app"]'), w = g.querySelector('[data-cta="web"]');
+    if (!a || !w) return;
+    const c = a.className; a.className = w.className; w.className = c;
+    g.insertBefore(w, a);
+  });
+  // 글 아래 "하러 가기" 버튼: 아이폰·아이패드는 App Store로, 나머지는 웹 게임으로 (/get/ 이 알아서 보내요)
+
   // 방문 통계(GoatCounter): 셈셈 놀이터와 구분되게 경로 앞에 /studio 를 붙여요.
   if (location.protocol.startsWith('http')) {
     window.goatcounter = { path: p => '/studio' + p };
