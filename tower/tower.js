@@ -1154,10 +1154,10 @@
     };
   })() : {
     ok: () => !!db,
-    get: async c => { const d = await db.collection('rooms').doc(c).get(); return d.exists ? d.data() : null; },
-    create: (c, d) => db.collection('rooms').doc(c).set({ ...d, at: firebase.firestore.FieldValue.serverTimestamp() }),
-    update: (c, patch) => db.collection('rooms').doc(c).update(patch),
-    sub: (c, cb) => db.collection('rooms').doc(c).onSnapshot(snap => cb(snap.exists ? snap.data() : null), () => cb(null)),
+    get: async c => { const d = await db.collection('towerRooms').doc(c).get(); return d.exists ? d.data() : null; },
+    create: (c, d) => db.collection('towerRooms').doc(c).set({ ...d, at: firebase.firestore.FieldValue.serverTimestamp() }),
+    update: (c, patch) => db.collection('towerRooms').doc(c).update(patch),
+    sub: (c, cb) => db.collection('towerRooms').doc(c).onSnapshot(snap => cb(snap.exists ? snap.data() : null), () => cb(null)),
   };
 
   let room = null; // { code, me: 0 | 1, name, data, round, unsub, beat }
