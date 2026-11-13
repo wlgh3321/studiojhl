@@ -187,22 +187,79 @@
       o.stop(t0 + dur + 0.02);
     } catch (e) {}
   }
+  // 짧은 잡음(부서지는 '팍' 소리)
+  let noiseBuf = null;
+  function noise(dur = 0.08, vol = 0.05, freq = 2500, delay = 0, q = 0.8) {
+    if (!soundOn) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      if (!noiseBuf) {
+        noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      const t0 = ac.currentTime + delay;
+      const src = ac.createBufferSource();
+      src.buffer = noiseBuf;
+      const f = ac.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.setValueAtTime(freq, t0);
+      f.Q.value = q;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(vol, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      src.connect(f).connect(g).connect(ac.destination);
+      src.start(t0);
+      src.stop(t0 + dur + 0.02);
+    } catch (e) {}
+  }
+  // 동글동글한 '뽁': 음이 위에서 아래로 살짝 떨어지는 사인파
+  function blip(freq, dur = 0.12, vol = 0.12, delay = 0, drop = 0.55, type = 'sine') {
+    if (!soundOn) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      const t0 = ac.currentTime + delay;
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t0);
+      o.frequency.exponentialRampToValueAtTime(freq * drop, t0 + dur);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol, t0 + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g).connect(ac.destination);
+      o.start(t0);
+      o.stop(t0 + dur + 0.02);
+    } catch (e) {}
+  }
+  const SCALE = [523, 587, 659, 784, 880, 1047, 1175, 1319, 1568]; // 도레미솔라… 고를수록 한 음씩 올라가요
+  const semi = k => Math.pow(2, k / 12);
   const sfx = {
-    pick: n => tone(300 + n * 60, 0.05, 'square', 0.025),
+    note: i => blip(SCALE[Math.min(i, SCALE.length) - 1] || 523, 0.09, 0.09, 0, 0.9, 'triangle'),
+    snap: () => { noise(0.03, 0.08, 4200, 0, 2); blip(1760, 0.05, 0.06, 0, 0.8, 'square'); },
     pop: (n, combo) => {
-      const base = 520 + Math.min(combo, 5) * 60;
-      for (let i = 0; i < Math.min(n, 5); i++) tone(base + i * 110, 0.09, 'square', 0.04, i * 0.04);
+      const up = semi(Math.min(combo - 1, 8) * 2);
+      blip(700 * up, 0.14, 0.16, 0, 0.45);
+      blip(1050 * up, 0.1, 0.06, 0.02, 0.5);
+      noise(0.07 + Math.min(n, 6) * 0.01, 0.06 + Math.min(n, 6) * 0.01, 3000, 0, 0.9);
+      if (n >= 4) blip(180, 0.18, 0.14, 0, 0.5); // 큰 연결은 묵직한 밑소리
     },
-    bad: () => tone(140, 0.15, 'sawtooth', 0.04),
-    hitme: () => { tone(110, 0.2, 'sawtooth', 0.06); tone(82, 0.25, 'square', 0.05, 0.08); },
-    send: () => [520, 780].forEach((f, i) => tone(f, 0.07, 'square', 0.04, i * 0.05)),
-    win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.14, 'square', 0.05, i * 0.1)),
-    boom: () => { tone(90, 0.25, 'sawtooth', 0.06); tone(60, 0.3, 'square', 0.05, 0.05); },
-    shuffle: () => [330, 392, 494].forEach((f, i) => tone(f, 0.07, 'triangle', 0.05, i * 0.05)),
-    rise: () => tone(220, 0.06, 'triangle', 0.05),
-    level: () => [660, 880, 1100].forEach((f, i) => tone(f, 0.1, 'square', 0.04, i * 0.08)),
-    over: () => [440, 330, 220, 150].forEach((f, i) => tone(f, 0.18, 'square', 0.05, i * 0.14)),
+    ice: () => { noise(0.1, 0.07, 6000, 0, 3); blip(2200, 0.06, 0.04, 0.02, 0.7, 'triangle'); },
+    bad: () => blip(200, 0.16, 0.08, 0, 0.6, 'triangle'),
+    hitme: () => { blip(160, 0.25, 0.16, 0, 0.4); noise(0.2, 0.06, 400, 0.02, 0.6); },
+    send: () => [700, 1050].forEach((f, i) => blip(f, 0.08, 0.08, i * 0.06, 0.9, 'triangle')),
+    win: () => [523, 659, 784, 1047].forEach((f, i) => blip(f, 0.2, 0.1, i * 0.1, 0.98, 'triangle')),
+    boom: () => { blip(160, 0.45, 0.25, 0, 0.25); noise(0.4, 0.12, 600, 0, 0.5); noise(0.12, 0.08, 3000, 0, 0.8); },
+    shuffle: () => [523, 659, 784].forEach((f, i) => blip(f, 0.08, 0.07, i * 0.05, 0.95, 'triangle')),
+    rise: () => { blip(150, 0.1, 0.1, 0, 0.7); noise(0.05, 0.03, 500, 0, 0.8); },
+    level: () => [784, 1047, 1319].forEach((f, i) => blip(f, 0.12, 0.08, i * 0.07, 0.98, 'triangle')),
+    over: () => [440, 349, 294, 220].forEach((f, i) => blip(f, 0.22, 0.1, i * 0.15, 0.9, 'triangle')),
   };
+  // 진동(안드로이드에서만 돼요). 소리를 끄면 진동도 꺼요.
+  const buzz = p => { try { if (soundOn && navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+  const calm = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function setSound(on) {
     soundOn = on;
     store.set(KEY.sound, on ? '1' : '0');
@@ -531,6 +588,8 @@
   function renderPath() {
     const state = pathState();
     const sum = state === 'ok' ? 10 : pathSum();
+    if (state === 'ok' && S.lastState !== 'ok') sfx.snap();
+    S.lastState = state;
     for (const el of els.values()) el.classList.remove('sel', 'ok', 'over');
     // 붙어 있는 칸끼리 선으로 이어서 보여 줘요.
     const link = $('link');
@@ -549,11 +608,33 @@
   }
 
   let lastHud = '';
+  let shownScore = 0;
+  let countRaf = 0;
+  // 점수는 촤르륵 올라가고, 오를 때 점수 칸이 툭 튀어요.
+  function countUp() {
+    cancelAnimationFrame(countRaf);
+    const from = shownScore;
+    const to = S.score;
+    if (to <= from || calm()) { shownScore = to; $('hudScore').textContent = to; return; }
+    const box = $('hudScore').parentElement;
+    box.classList.remove('bump');
+    void box.offsetWidth;
+    box.classList.add('bump');
+    const t0 = performance.now();
+    const dur = Math.min(450, 180 + (to - from) * 0.6);
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      shownScore = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      $('hudScore').textContent = shownScore;
+      if (k < 1) countRaf = requestAnimationFrame(step);
+    };
+    countRaf = requestAnimationFrame(step);
+  }
   function renderHud() {
     const key = `${S.score}|${S.level}`;
     if (key !== lastHud) {
       lastHud = key;
-      $('hudScore').textContent = S.score;
+      if (S.score !== shownScore) countUp();
       $('hudLevel').textContent = S.level;
       $('hudBest').textContent = Math.max(getBest(), S.score);
     }
@@ -605,15 +686,93 @@
     const path = S.path;
     const last = path[path.length - 1];
     if (cell.kind === 'bomb' || cell.ice) return;
-    if (!last) { path.push(cell); sfx.pick(cell.v || 5); return; }
+    if (!last) { path.push(cell); tapFx(cell); return; }
     if (cell === last) return;
     const back = path[path.length - 2];
     if (cell === back) { path.pop(); return; }
-    if (canExtend(cell)) { path.push(cell); sfx.pick(cell.v || 5); }
+    if (canExtend(cell)) { path.push(cell); tapFx(cell); }
   }
 
   // ★이 든 길은 숫자 합이 9가 되거나 손가락을 뗄 때 터져요(더 길게 이을 수 있게).
   const waitStar = () => pathHasStar() && pathSum() < 9;
+  // 고른 칸: 눌렸다 통 튀고, 고를수록 음이 올라가요.
+  function tapFx(cell) {
+    sfx.note(S.path.length);
+    const el = els.get(cell.id);
+    if (!el) return;
+    el.classList.remove('tap');
+    void el.offsetWidth;
+    el.classList.add('tap');
+  }
+
+  /* ---------- 손맛 효과 ---------- */
+  function burst(x, y, color, count, power) {
+    if (calm()) return;
+    const fx = $('fx');
+    for (let i = 0; i < count; i++) {
+      const a = (Math.PI * 2 * i) / count + Math.random() * 0.6;
+      const d = power * (0.6 + Math.random() * 0.6);
+      const p = document.createElement('i');
+      p.className = 'fx-bit';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = color;
+      const sz = 7 + Math.random() * 7;
+      p.style.width = p.style.height = sz + 'px';
+      p.style.setProperty('--dx', Math.cos(a) * d + 'px');
+      p.style.setProperty('--dy', Math.sin(a) * d - power * 0.3 + 'px');
+      p.style.setProperty('--r', (Math.random() * 360 - 180) + 'deg');
+      fx.appendChild(p);
+      setTimeout(() => p.remove(), 560);
+    }
+    const ring = document.createElement('i');
+    ring.className = 'fx-ring';
+    ring.style.left = x + 'px';
+    ring.style.top = y + 'px';
+    ring.style.borderColor = color;
+    fx.appendChild(ring);
+    setTimeout(() => ring.remove(), 420);
+  }
+  // 칸 하나를 터뜨리는 모양(번쩍 → 조각). 요소는 상태와 따로 잠시 남아 있다가 사라져요.
+  function shatter(cell, power) {
+    const el = els.get(cell.id);
+    if (!el) return;
+    els.delete(cell.id);
+    el.classList.remove('sel', 'ok', 'over', 'tap');
+    el.classList.add('pop');
+    const b = el.querySelector('.b');
+    const r = el.getBoundingClientRect();
+    const color = b ? getComputedStyle(b).backgroundColor : '#f2b640';
+    burst(r.left + r.width / 2, r.top + r.height / 2, color, 7, power);
+    setTimeout(() => el.remove(), 300);
+  }
+  function shake(kind) {
+    if (calm()) return;
+    const w = $('board').parentElement;
+    w.classList.remove('shake-s', 'shake-l');
+    void w.offsetWidth;
+    w.classList.add(kind);
+    setTimeout(() => w.classList.remove(kind), 320);
+  }
+  function punch() {
+    if (calm()) return;
+    const c = document.querySelector('.console');
+    c.classList.remove('punch');
+    void c.offsetWidth;
+    c.classList.add('punch');
+    setTimeout(() => c.classList.remove('punch'), 360);
+  }
+  function comboFx(x, y, combo) {
+    const n = document.createElement('div');
+    n.className = 'fx-combo c' + Math.min(combo, 6);
+    n.style.left = x + 'px';
+    n.style.top = y + 'px';
+    n.style.fontSize = Math.min(18 + combo * 3, 36) + 'px';
+    n.textContent = 'COMBO ×' + combo;
+    $('fx').appendChild(n);
+    setTimeout(() => n.remove(), 800);
+  }
+
   function check() {
     if (pathState() === 'ok' && !waitStar()) {
       popPath();
@@ -651,10 +810,10 @@
       S.path = path.slice(0, i + 1); // 고른 길 중간을 누르면 거기까지로 줄여요
     } else if (canExtend(cell)) {
       path.push(cell);
-      sfx.pick(cell.v || 5);
+      tapFx(cell);
     } else {
       S.path = [cell];
-      sfx.pick(cell.v || 5);
+      tapFx(cell);
     }
     S.dragging = true;
     check();
@@ -696,6 +855,8 @@
   function startFever() {
     S.feverUntil = S.elapsed + FEVER_SEC;
     $('board').classList.add('fever');
+    punch();
+    buzz([20, 40, 20]);
     $('hint').textContent = t('feverHint');
     sfx.level();
     later(() => fxCenter(t('fever')), 200);
@@ -717,7 +878,7 @@
     if (S.combo % FEVER_COMBO === 0) startFever();
     const mult = Math.min(S.combo, 5) * (feverOn() ? 2 : 1);
     const pts = 5 * n * n * mult;
-    if (thaw(S.cols, path)) sfx.pick(9);
+    if (thaw(S.cols, path)) sfx.ice();
     S.score += pts;
     S.pops += 1;
     S.cleared += n;
@@ -734,26 +895,37 @@
       sx += r.left + r.width / 2;
       sy += r.top + r.height / 2;
     }
-    fxAt(sx / n, sy / n, mult > 1 ? `+${pts} ×${mult}` : `+${pts}`, n >= 4 || mult >= 3);
-
+    const heavy = n >= 4;
+    const cx = sx / n, cy = sy / n;
+    // 큰 연결은 아주 잠깐 멈췄다가(히트 스톱) 터져요.
+    const doPop = () => {
+      for (const cell of path) shatter(cell, heavy ? 70 : 52);
+      fxAt(cx, cy, mult > 1 ? `+${pts} ×${mult}` : `+${pts}`, heavy || mult >= 3);
+      if (S.combo >= 2) comboFx(cx, cy - 48, S.combo);
+      sfx.pop(n, S.combo);
+      buzz(heavy ? 28 : 12);
+      if (heavy) shake('shake-s');
+      render();
+    };
     for (const cell of path) {
-      const el = els.get(cell.id);
-      el.classList.remove('sel', 'ok', 'over');
-      el.classList.add('pop');
-      els.delete(cell.id);
-      setTimeout(() => el.remove(), 300);
       const col = S.cols[cell.c];
       col.splice(col.indexOf(cell), 1);
     }
     S.path = [];
-    sfx.pop(n, S.combo);
+    S.lastState = '';
+    renderPath();
+    if (heavy && !calm()) {
+      for (const cell of path) { const el = els.get(cell.id); if (el) { el.classList.remove('sel', 'ok', 'over', 'tap'); el.classList.add('hit'); } }
+      setTimeout(doPop, 70);
+    } else doPop();
 
     if (n >= 5) { S.score += 200; later(() => fxCenter(t('longChain')), 250); }
     if (S.vs) {
       if (usedStar) vsShield();
       vsAttack((S.combo % 3 === 0 ? 1 : 0) + (n >= 5 ? 1 : 0));
     }
-    afterClear();
+    renderHud();
+    later(ensureMoves, 320);
   }
 
   // 칸이 지워진 뒤: 레벨 확인, 다시 그리기, 잠시 뒤 막힘 검사
@@ -782,21 +954,26 @@
     S.lastActAt = S.elapsed;
     S.riseIn = Math.min(S.riseMax, S.riseIn + POP_BONUS);
     clearHint();
-    fxAt(x, y, `+${pts}`, true);
     for (const cell of hitCells) {
-      const el = els.get(cell.id);
-      el.classList.remove('sel', 'ok', 'over');
-      el.classList.add('pop');
-      els.delete(cell.id);
-      setTimeout(() => el.remove(), 300);
       const col = S.cols[cell.c];
       col.splice(col.indexOf(cell), 1);
     }
-    sfx.boom();
-    $('board').classList.add('shake');
-    setTimeout(() => $('board').classList.remove('shake'), 300);
+    S.path = [];
+    renderPath();
+    for (const cell of hitCells) { const el = els.get(cell.id); if (el) el.classList.add('hit'); }
+    const doBlast = () => {
+      for (const cell of hitCells) shatter(cell, 90);
+      burst(x, y, '#e8553e', 12, 120);
+      fxAt(x, y, `+${pts}`, true);
+      sfx.boom();
+      buzz([30, 30, 40]);
+      shake('shake-l');
+      render();
+    };
+    if (calm()) doBlast(); else setTimeout(doBlast, 80);
     if (S.vs) vsAttack(1);
-    afterClear();
+    renderHud();
+    later(ensureMoves, 400);
   }
 
   /* ---------- 줄 올리기 ---------- */
@@ -878,6 +1055,9 @@
     $('hint').textContent = t(S.tutorial ? 'hintTut' : 'hint');
     $('link').setAttribute('d', '');
     lastHud = '';
+    shownScore = 0;
+    cancelAnimationFrame(countRaf);
+    $('hudScore').textContent = '0';
     $('riseFill').style.width = '0%';
     $('nextSeconds').textContent = S.riseMax.toFixed(1) + t('sec');
     $('gameMode').textContent = t(isVs() ? (vsCfg.kind === 'cpu' ? 'modeCpu' : 'modeNet') : isDaily() ? 'modeDaily' : 'modeSolo');
@@ -936,7 +1116,7 @@
     tip.style.top = (below ? Math.min(vh - h - 12, r.bottom + pad + 14) : Math.max(12, r.top - pad - 14 - h)) + 'px';
     tip.dataset.side = below ? 'below' : 'above';
     tip.style.setProperty('--ax', Math.max(20, Math.min(w - 20, cx - parseFloat(tip.style.left))) + 'px');
-    sfx.pick(7);
+    sfx.note(3);
     $('coachGo').focus();
   }
   function coachDone() {
@@ -1260,8 +1440,7 @@
     let ok = true;
     for (let i = 0; i < n && ok; i++) { for (let c = 0; c < COLS; c++) S.cols[c].unshift(makeCell(c, false, Math.random)); ok = !overflow(S.cols); }
     sfx.hitme();
-    $('board').classList.add('shake');
-    setTimeout(() => $('board').classList.remove('shake'), 300);
+    shake('shake-l');
     render();
     if (!ok) gameOver(); else later(ensureMoves, 200);
   }
