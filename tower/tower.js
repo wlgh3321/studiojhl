@@ -17,7 +17,7 @@
   const COLS = 6;
   const ROWS = 10;
   const START_ROWS = 4;
-  const KEY = { best: 'tower:best', name: 'tower:name', lang: 'tower:lang', sound: 'tower:sound', tut: 'tower:tutorial', items: 'tower:items', bombTip: 'tower:bombTip' };
+  const KEY = { best: 'tower:best', name: 'tower:name', lang: 'tower:lang', sound: 'tower:sound', tut: 'tower:tutorial', coach: 'tower:coach:' };
   const WEIGHTS = [3, 3, 3, 3, 3, 2, 2, 1, 1]; // 1~9가 나오는 비율 (작은 수가 더 자주)
   const WEIGHT_SUM = WEIGHTS.reduce((a, b) => a + b, 0);
   const P_BOMB = 0.015;
@@ -27,6 +27,9 @@
   const POP_BONUS = 0.6;  // 한 번 터뜨릴 때마다 다음 줄이 늦게 오는 시간(초)
   const LEVEL_SEC = 40;   // 이만큼(초)마다 레벨이 올라요
   const SLOW_DANGER = 1.5; // 위험할 때 줄이 이만큼 느리게 올라와요
+  const FEVER_COMBO = 5;  // 콤보가 이만큼 이어지면 피버 타임
+  const FEVER_SEC = 5;    // 피버 타임 길이(초): 점수 2배, 새 줄이 멈춰요
+  const iceRate = lv => (lv >= 6 ? 0.12 : lv >= 3 ? 0.08 : 0); // 얼음 블록이 섞이는 비율
   const ICON = {
     star: '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8 1.6l1.9 4 4.4.6-3.2 3 .8 4.4L8 11.5l-3.9 2.1.8-4.4-3.2-3 4.4-.6z"/></svg>',
     bomb: '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M9.6 5.2c.4-1.6 1.4-2.6 3-2.8"/><circle cx="7.2" cy="9.6" r="5" fill="currentColor"/><circle cx="5.4" cy="7.8" r="1.3" fill="#fff" opacity=".85"/><circle cx="13.2" cy="2.2" r="1.2" fill="#ff6f6f"/></svg>',
@@ -86,12 +89,12 @@
       incoming: '공격 예고', cpu: '컴퓨터', you: '나', win: 'YOU WIN!', lose: 'YOU LOSE',
       oppLeft: '상대가 나갔어요', attack: '공격 +{n}', blocked: '방어!', offset: '상쇄 -{n}',
       vsPause: '온라인 대전은 멈출 수 없어요. 게임은 계속 진행돼요.', rematch: '한 판 더',
-      bomb: '폭탄', bombReady: '폭탄 준비 완료! 버튼을 눌러 보세요', aimHint: '터뜨릴 곳을 눌러요',
-      itemsTitle: '아이템 안내', itemsGo: '알겠어요',
-      itStar: '별', itStarD: '모자란 숫자를 채워 줘요.<br>합이 10보다 작아도 펑!',
-      itBomb: '폭탄 블록', itBombD: '누르면 주변 9칸이<br>한 번에 펑!',
-      itGauge: '폭탄 버튼', itGaugeD: '연달아 터뜨려 게이지를 채우고,<br>누른 뒤 원하는 곳을 터치!',
-      itemsNote: '빨리 터뜨릴수록 다음 줄이 늦게 올라와요.',
+      bomb: '폭탄', aimHint: '터뜨릴 곳을 눌러요', gotIt: '알겠어요',
+      fever: 'FEVER! ×2', feverHint: '피버! 점수 2배',
+      coStar: '별', coStarD: '모자란 숫자를 채워 줘요.<br>이은 합이 10보다 작아도 펑!',
+      coBomb: '폭탄 블록', coBombD: '누르면 주변 9칸이 한 번에 펑!',
+      coIce: '얼음 블록', coIceD: '옆 칸을 터뜨리면 얼음이 깨져요.<br>그전에는 이을 수 없어요.',
+      coGauge: '폭탄 버튼', coGaugeD: '게이지가 다 찼어요!<br>누른 뒤 원하는 곳을 터치하면 펑!',
     },
     en: {
       studio: '◀ JHL STUDIO', nameKo: 'Make 10. Pop the tower.',
@@ -107,7 +110,7 @@
       hofOff: "Can't load the rankings right now",
       sumsum: 'SumSum Playground', privacy: 'Privacy',
       score: 'Score', level: 'Level', best: 'Best',
-      hint: 'Tap or drag to connect',
+      hint: 'Drag to connect',
       hintTut: 'Tap the blinking numbers to make 10',
       shuffled: 'Shuffled!', longChain: 'LONG CHAIN +200',
       pauseNote: "Time is stopped. Continue when you're ready.",
@@ -136,12 +139,12 @@
       incoming: 'Incoming', cpu: 'CPU', you: 'You', win: 'YOU WIN!', lose: 'YOU LOSE',
       oppLeft: 'Your rival left', attack: 'Attack +{n}', blocked: 'Blocked!', offset: 'Cancel -{n}',
       vsPause: "Online matches can't be paused. The game keeps running.", rematch: 'Rematch',
-      bomb: 'Bomb', bombReady: 'Bomb ready! Tap the button', aimHint: 'Tap where to blast',
-      itemsTitle: 'Items', itemsGo: 'Got it',
-      itStar: 'Star', itStarD: 'Fills in what is missing.<br>Pops even under 10!',
-      itBomb: 'Bomb block', itBombD: 'Tap it to blast<br>the 9 cells around it.',
-      itGauge: 'Bomb button', itGaugeD: 'Combos fill the gauge.<br>Tap it, then tap a spot!',
-      itemsNote: 'The faster you pop, the later the next row comes.',
+      bomb: 'Bomb', aimHint: 'Tap where to blast', gotIt: 'Got it',
+      fever: 'FEVER! ×2', feverHint: 'Fever! Double points',
+      coStar: 'Star', coStarD: 'Fills in what is missing.<br>Pops even under 10!',
+      coBomb: 'Bomb block', coBombD: 'Tap it to blast the 9 cells around it.',
+      coIce: 'Ice block', coIceD: 'Pop a cell next to it to break the ice.<br>Until then it can’t be linked.',
+      coGauge: 'Bomb button', coGaugeD: 'The gauge is full!<br>Tap it, then tap anywhere to blast.',
     },
   };
   let lang = store.get(KEY.lang, '') || ((navigator.language || 'ko').toLowerCase().startsWith('ko') ? 'ko' : 'en');
@@ -292,15 +295,20 @@
   }
   // 새 줄 한 줄. 바로 옆끼리 합 10인 짝이 적어도 두 개 생기게 맞춰요(꽉 막힌 줄이 안 나오게).
   // 난수는 늘 같은 횟수만 써서 오늘의 탑은 모두 같은 줄을 받아요.
-  function makeRow(special, gen = rng) {
+  function makeRow(special, gen = rng, lv = 1) {
     const row = [];
-    for (let c = 0; c < COLS; c++) row.push(makeCell(c, special, gen));
+    for (let c = 0; c < COLS; c++) {
+      const cell = makeCell(c, special, gen);
+      const r = gen(); // 얼음 여부(늘 한 번 써요)
+      if (special && cell.kind === 'n' && r < iceRate(lv)) cell.ice = true;
+      row.push(cell);
+    }
     // 겹치지 않는 세 자리(0·1, 2·3, 4·5) 중 정해진 순서대로 짝을 맞춰요.
     const order = [[0, 2, 4], [0, 4, 2], [2, 0, 4], [2, 4, 0], [4, 0, 2], [4, 2, 0]][Math.floor(gen() * 6)];
-    const isN = x => x.kind === 'n';
+    const isN = x => x.kind === 'n' && !x.ice;
     const pairs = () => { let k = 0; for (let i = 0; i < COLS - 1; i++) if (isN(row[i]) && isN(row[i + 1]) && row[i].v + row[i + 1].v === 10) k++; return k; };
     for (const i of order) {
-      if (pairs() >= 2) break;
+      if (pairs() >= 1) break;
       if (isN(row[i]) && isN(row[i + 1]) && row[i].v + row[i + 1].v !== 10) row[i + 1].v = 10 - row[i].v;
     }
     return row;
@@ -316,7 +324,7 @@
   function newState() {
     return {
       cols: Array.from({ length: COLS }, () => []),
-      gauge: 0, aim: false,
+      gauge: 0, aim: false, feverUntil: -1, coach: null,
       score: 0, level: 1, pops: 0, cleared: 0, maxChain: 0, combo: 0, maxCombo: 0, lastPopAt: -99,
       lastActAt: 0, hint: null, tutorial: false, vs: null,
       riseMax: riseTime(1), riseIn: riseTime(1), elapsed: 0,
@@ -327,7 +335,7 @@
 
   // 아래에 새 줄을 넣어요. 어느 줄이든 꼭대기를 넘으면 false.
   function pushRow(special) {
-    makeRow(special).forEach((cell, c) => S.cols[c].unshift(cell));
+    makeRow(special, rng, S.level).forEach((cell, c) => S.cols[c].unshift(cell));
     return !S.cols.some(col => col.length > ROWS);
   }
 
@@ -355,7 +363,7 @@
     return sum === 10 && n >= 2 ? 'ok' : sum > 10 ? 'over' : '';
   }
   function canExtend(cell) {
-    if (!S.path.length || cell.kind === 'bomb' || S.path.includes(cell)) return false;
+    if (!S.path.length || cell.kind === 'bomb' || cell.ice || S.path.includes(cell)) return false;
     if (cell.kind === 'star' && pathHasStar()) return false;
     const st = pathState();
     if (st === 'over' || (st === 'ok' && !pathHasStar())) return false;
@@ -375,7 +383,7 @@
   function findMove(cols = S.cols) {
     const cells = [];
     cols.forEach((col, c) => col.forEach((cell, r) => cells.push({ cell, r, c })));
-    const nums = cells.filter(x => x.cell.kind !== 'bomb');
+    const nums = cells.filter(x => x.cell.kind !== 'bomb' && !x.cell.ice);
     const nb = new Map(nums.map(a => [a, nums.filter(b => b !== a && linked(cols, a.c, a.r, b.c, b.r))]));
     let found = null;
     function dfs(path, sum, star, maxLen) {
@@ -424,7 +432,7 @@
     }
     if (!findMove()) { // 섞어도 안 되면(예: 큰 수만 남음) 한 칸을 ★로 바꿔 줘요
       const cell = all[Math.floor(Math.random() * all.length)];
-      cell.kind = 'star'; cell.v = 0;
+      cell.kind = 'star'; cell.v = 0; cell.ice = false;
       const el = els.get(cell.id);
       if (el) { el.remove(); els.delete(cell.id); }
     }
@@ -451,6 +459,7 @@
   /* ---------- 그리기 ---------- */
   function render() {
     if (S.vs) S.vs.dirty = true; // 온라인 상대에게 바뀐 판을 보내요
+    S.drawnAt = performance.now();
     const board = $('board');
     const alive = new Set();
     for (let c = 0; c < COLS; c++) {
@@ -466,6 +475,7 @@
           board.appendChild(el);
           els.set(cell.id, el);
         }
+        el.classList.toggle('ice', !!cell.ice);
         if (cell.fresh) {
           el.classList.add('new');
           cell.fresh = false;
@@ -499,16 +509,13 @@
     if (S.gauge >= GAUGE_MAX) return;
     // 한 번에 1칸, 콤보 ×3부터 +1, 4개 이상 이으면 +1
     S.gauge = Math.min(GAUGE_MAX, S.gauge + 1 + (S.combo >= 3 ? 1 : 0) + (n >= 4 ? 1 : 0));
-    if (S.gauge >= GAUGE_MAX) {
-      sfx.level();
-      if (store.get(KEY.bombTip, '') !== '1') { store.set(KEY.bombTip, '1'); toast(t('bombReady')); }
-    }
+    if (S.gauge >= GAUGE_MAX) sfx.level();
   }
   function setAim(on) {
     S.aim = on;
     S.path = [];
     renderPath();
-    $('hint').textContent = on ? t('aimHint') : t(S.tutorial ? 'hintTut' : 'hint');
+    $('hint').textContent = on ? t('aimHint') : t(feverOn() ? 'feverHint' : S.tutorial ? 'hintTut' : 'hint');
     renderGauge();
   }
   function bombBtn() {
@@ -595,7 +602,7 @@
   function extend(cell) {
     const path = S.path;
     const last = path[path.length - 1];
-    if (cell.kind === 'bomb') return;
+    if (cell.kind === 'bomb' || cell.ice) return;
     if (!last) { path.push(cell); sfx.pick(cell.v || 5); return; }
     if (cell === last) return;
     const back = path[path.length - 2];
@@ -631,6 +638,7 @@
     if (!S.tutorial) clearHint();
     if (!cell) { S.path = []; renderPath(); return; }
     if (cell.kind === 'bomb') { S.path = []; explode(cell); return; }
+    if (cell.ice) { S.path = []; sfx.bad(); renderPath(); return; }
     try { $('board').setPointerCapture(e.pointerId); } catch (err) {}
     const path = S.path;
     const last = path[path.length - 1];
@@ -673,6 +681,29 @@
   }
 
   /* ---------- 터뜨리기 ---------- */
+  // 지워질 칸 바로 옆(위·아래·왼쪽·오른쪽) 얼음을 깨요. 지우기 전에 불러요.
+  function thaw(cols, gone) {
+    const pos = gone.map(g => { const c = cols.findIndex(col => col.includes(g)); return [c, cols[c].indexOf(g)]; });
+    let n = 0;
+    cols.forEach((col, c) => col.forEach((cell, r) => {
+      if (cell.ice && !gone.includes(cell) && pos.some(([gc, gr]) => Math.abs(gc - c) + Math.abs(gr - r) === 1)) { cell.ice = false; n++; }
+    }));
+    return n;
+  }
+  const feverOn = () => S.elapsed < S.feverUntil;
+  function startFever() {
+    S.feverUntil = S.elapsed + FEVER_SEC;
+    $('board').classList.add('fever');
+    $('hint').textContent = t('feverHint');
+    sfx.level();
+    later(() => fxCenter(t('fever')), 200);
+  }
+  function endFever() {
+    S.feverUntil = -1;
+    $('board').classList.remove('fever');
+    if (!S.aim) $('hint').textContent = t(S.tutorial ? 'hintTut' : 'hint');
+  }
+
   function popPath() {
     const path = S.path;
     const n = path.length;
@@ -681,8 +712,10 @@
     S.lastPopAt = S.elapsed;
     S.riseIn = Math.min(S.riseMax, S.riseIn + POP_BONUS);
     charge(n);
-    const mult = Math.min(S.combo, 5);
+    if (S.combo % FEVER_COMBO === 0) startFever();
+    const mult = Math.min(S.combo, 5) * (feverOn() ? 2 : 1);
     const pts = 5 * n * n * mult;
+    if (thaw(S.cols, path)) sfx.pick(9);
     S.score += pts;
     S.pops += 1;
     S.cleared += n;
@@ -739,7 +772,8 @@
       if (c < 0 || c >= COLS) continue;
       for (let r = r0 - 1; r <= r0 + 1; r++) { const cell = S.cols[c][r]; if (cell) hitCells.push(cell); }
     }
-    const pts = hitCells.length * 10;
+    thaw(S.cols, hitCells);
+    const pts = hitCells.length * 10 * (feverOn() ? 2 : 1);
     S.score += pts;
     S.pops += 1;
     S.cleared += hitCells.length;
@@ -798,7 +832,8 @@
         renderHud();
       }
       // 처음 하는 사람은 첫 조합을 터뜨릴 때까지 기다려 줘요. 꼭대기 가까이 차면 천천히 올라와요.
-      if (!S.tutorial) S.riseIn -= inDanger() ? dt / SLOW_DANGER : dt;
+      if (S.feverUntil > 0 && !feverOn()) endFever();
+      if (!S.tutorial && !feverOn()) S.riseIn -= inDanger() ? dt / SLOW_DANGER : dt;
       if (!S.hint && !S.aim && !S.path.length && S.elapsed - S.lastActAt >= HINT_AFTER) showHint();
       if (S.vs) { vsStep(dt); if (S.over) return; }
       if (S.riseIn <= 0) rise(false);
@@ -808,6 +843,8 @@
       $('nextSeconds').textContent = Math.max(0, S.riseIn).toFixed(1) + t('sec');
       $('riseFill').parentElement.classList.toggle('hurry', S.riseIn < 1.5);
       $('riseFill').parentElement.classList.toggle('slow', inDanger());
+      $('riseFill').parentElement.classList.toggle('fever', feverOn());
+      if (!S.tutorial && !S.path.length && !S.aim && !S.dragging) coachCheck();
     }
     raf = requestAnimationFrame(loop);
   }
@@ -843,14 +880,66 @@
     track('start');
     lastTs = performance.now();
     raf = requestAnimationFrame(loop);
-    // 처음 한 번은 아이템 안내를 보여 주고 시작해요(온라인 대전은 함께 시작해야 해서 건너뛰어요).
-    if (store.get(KEY.items, '') !== '1' && !(isVs() && vsCfg.kind === 'net')) { $('itemsBox').hidden = false; return; }
+    $('board').classList.remove('fever', 'aiming');
     countdown();
   }
-  function itemsDone() {
-    store.set(KEY.items, '1');
-    $('itemsBox').hidden = true;
-    if (S && !S.over && !S.running) countdown();
+
+  /* ---------- 처음 보는 아이템 설명: 잠깐 멈추고 그 칸만 반짝여요 (한 번만) ---------- */
+  const COACH = ['star', 'bomb', 'ice', 'gauge'];
+  const coachSeen = k => store.get(KEY.coach + k, '') === '1';
+  function coachTarget(k) {
+    if (k === 'gauge') return S.gauge >= GAUGE_MAX ? $('bombBtn') : null;
+    for (const col of S.cols) for (const cell of col) {
+      if (k === 'ice' ? cell.ice : cell.kind === k) { const el = els.get(cell.id); if (el && !el.classList.contains('new')) return el; }
+    }
+    return null;
+  }
+  function coachCheck() {
+    if (S.coach || (S.vs && S.vs.kind === 'net')) return; // 온라인 대전은 멈출 수 없어서 건너뛰어요
+    if (performance.now() - (S.drawnAt || 0) < 300) return; // 칸이 움직이는 중이면 멈춘 뒤에 보여 줘요
+    for (const k of COACH) {
+      if (coachSeen(k)) continue;
+      const el = coachTarget(k);
+      if (el) { coachShow(k, el); return; }
+    }
+  }
+  function coachShow(k, el) {
+    S.coach = k;
+    S.running = false;
+    S.dragging = false;
+    const r = el.getBoundingClientRect();
+    const pad = 6;
+    const spot = $('coachSpot');
+    spot.style.left = r.left - pad + 'px';
+    spot.style.top = r.top - pad + 'px';
+    spot.style.width = r.width + pad * 2 + 'px';
+    spot.style.height = r.height + pad * 2 + 'px';
+    spot.style.borderRadius = k === 'gauge' ? '50%' : '14px';
+    const key = { star: 'coStar', bomb: 'coBomb', ice: 'coIce', gauge: 'coGauge' }[k];
+    $('coachTitle').textContent = t(key);
+    $('coachText').innerHTML = t(key + 'D');
+    const box = $('coach');
+    box.hidden = false;
+    const tip = $('coachTip');
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const cx = r.left + r.width / 2;
+    tip.style.left = Math.max(12, Math.min(vw - w - 12, cx - w / 2)) + 'px';
+    const below = r.top + r.height / 2 < vh / 2;
+    tip.style.top = (below ? Math.min(vh - h - 12, r.bottom + pad + 14) : Math.max(12, r.top - pad - 14 - h)) + 'px';
+    tip.dataset.side = below ? 'below' : 'above';
+    tip.style.setProperty('--ax', Math.max(20, Math.min(w - 20, cx - parseFloat(tip.style.left))) + 'px');
+    sfx.pick(7);
+    $('coachGo').focus();
+  }
+  function coachDone() {
+    if (!S || !S.coach) return;
+    store.set(KEY.coach + S.coach, '1');
+    S.coach = null;
+    $('coach').hidden = true;
+    if (!S.over) { S.running = true; lastTs = performance.now(); }
   }
 
   function countdown() {
@@ -877,7 +966,7 @@
   }
 
   function pause() {
-    if (!S || S.over) return;
+    if (!S || S.over || S.coach) return;
     if (!S.running) {
       if (!S.paused) toTitle(); // 카운트다운 중에는 처음 화면으로
       return;
@@ -905,7 +994,7 @@
     $('pauseBox').hidden = true;
     $('overBox').hidden = true;
     $('countdown').hidden = true;
-    $('itemsBox').hidden = true;
+    $('coach').hidden = true;
     show('title');
     $('titleBest').textContent = Number(store.get(KEY.best, '0')) || 0;
     loadHof();
@@ -1072,7 +1161,7 @@
     const gen = seeded(seed);
     const pace = { easy: 3.4, normal: 2.5, hard: 1.8 }[level] || 2.5;
     const B = { name: t('cpu'), alive: true, cols: Array.from({ length: COLS }, () => []), out: 0, pend: [], el: 0, cleared: 0, lvl: 1, riseIn: riseTime(1), actIn: pace + 1.5, combo: 0, lastPop: -99 };
-    const push = (special, g) => { makeRow(special, g).forEach((cell, c) => B.cols[c].unshift(cell)); if (overflow(B.cols)) B.alive = false; };
+    const push = (special, g) => { makeRow(special, g, B.lvl).forEach((cell, c) => B.cols[c].unshift(cell)); if (overflow(B.cols)) B.alive = false; };
     for (let i = 0; i < START_ROWS; i++) push(false, gen);
     const attack = k => {
       while (k > 0 && B.pend.length) { const p = B.pend[0]; const c = Math.min(k, p.n); p.n -= c; k -= c; if (!p.n) B.pend.shift(); }
@@ -1102,6 +1191,7 @@
         if (move.some(x => x.kind === 'star')) B.pend = [];
         lines = (B.combo % 3 === 0 ? 1 : 0) + (move.length >= 5 ? 1 : 0);
       }
+      thaw(B.cols, gone);
       B.cols = B.cols.map(col => col.filter(x => !gone.includes(x)));
       B.cleared += gone.length;
       B.riseIn = Math.min(riseTime(B.lvl), B.riseIn + POP_BONUS);
@@ -1444,7 +1534,7 @@
   }));
   $('upBtn').addEventListener('click', () => rise(true));
   $('bombBtn').addEventListener('click', bombBtn);
-  $('itemsGo').addEventListener('click', itemsDone);
+  $('coachGo').addEventListener('click', coachDone);
   $('pauseBtn').addEventListener('click', pause);
   $('resumeBtn').addEventListener('click', resume);
   $('restartBtn').addEventListener('click', again);
@@ -1497,5 +1587,5 @@
   if (/^[A-Z0-9]{5}$/.test(invited)) vsOpen(invited);
 
   // 테스트용 (자동 검사에서만 써요)
-  window.__tower = { get state() { return S; }, get room() { return room; }, vsAttack, renderHof, popPath, rise, findMove, ensureMoves, explode, showHint, makeRow, renderGauge };
+  window.__tower = { get state() { return S; }, get room() { return room; }, vsAttack, renderHof, popPath, rise, findMove, ensureMoves, explode, showHint, makeRow, renderGauge, coachCheck, coachDone };
 })();
