@@ -25,7 +25,8 @@
   const HINT_AFTER = 5; // 이만큼(초) 못 터뜨리면 힌트
   const GAUGE_MAX = 16;   // 폭탄 게이지가 다 차는 양
   const POP_BONUS = 0.6;  // 한 번 터뜨릴 때마다 다음 줄이 늦게 오는 시간(초)
-  const LEVEL_SEC = 30;   // 이만큼(초)마다 레벨이 올라요
+  const LEVEL_CLEAR = 25; // 블록을 이만큼 지울 때마다 레벨이 올라요
+  const SPARSE = 12;      // 판에 블록이 이보다 적으면 새 줄이 3배 빨리 와요(기다리지 않게)
   const SLOW_DANGER = 1.5; // 위험할 때 줄이 이만큼 느리게 올라와요
   const FEVER_COMBO = 5;  // 콤보가 이만큼 이어지면 피버 타임
   const FEVER_SEC = 5;    // 피버 타임 길이(초): 점수 2배, 새 줄이 멈춰요
@@ -265,9 +266,9 @@
   let idSeq = 0;
   const els = new Map(); // 칸 id → 화면 요소
 
-  // 새 줄 간격(초): 6.5초에서 시작해 1분에 0.7초씩 계속 빨라지고, 5분쯤 3초에서 멈춰요.
-  const riseTime = sec => Math.max(3, 6.5 - (sec * 0.7) / 60);
-  const levelOf = sec => 1 + Math.floor(sec / LEVEL_SEC);
+  // 새 줄 간격(초): 레벨 1은 6.5초, 레벨마다 0.35초씩 빨라져서 레벨 11부터 3초.
+  const riseTime = lv => Math.max(3, 6.5 - 0.35 * (lv - 1));
+  const levelOf = cleared => 1 + Math.floor(cleared / LEVEL_CLEAR);
 
   // 숫자 뽑기. 오늘의 탑은 날짜로 정해진 순서(mulberry32), 기본 모드는 그냥 무작위.
   let rng = Math.random;
@@ -328,7 +329,7 @@
       gauge: 0, aim: false, feverUntil: -1, coach: null,
       score: 0, level: 1, pops: 0, cleared: 0, maxChain: 0, combo: 0, maxCombo: 0, lastPopAt: -99,
       lastActAt: 0, hint: null, tutorial: false, vs: null,
-      riseMax: riseTime(0), riseIn: riseTime(0), elapsed: 0,
+      riseMax: riseTime(1), riseIn: riseTime(1), elapsed: 0,
       running: false, paused: false, over: false,
       path: [], dragging: false, timers: [],
     };
@@ -807,7 +808,7 @@
       fxAt(r.left + r.width / 2, r.top, '+5');
     }
     const ok = pushRow(true);
-    S.riseMax = riseTime(S.elapsed);
+    S.riseMax = riseTime(S.level);
     S.riseIn = S.riseMax;
     sfx.rise();
     render();
@@ -823,10 +824,10 @@
     if (S.running) {
       const dt = Math.min(real, 0.25);
       S.elapsed += dt;
-      const lv = levelOf(S.elapsed);
+      const lv = levelOf(S.cleared);
       if (lv > S.level) {
         S.level = lv;
-        S.riseMax = riseTime(S.elapsed);
+        S.riseMax = riseTime(lv);
         S.riseIn = Math.min(S.riseIn, S.riseMax);
         sfx.level();
         fxCenter(t('levelUp', { n: lv }));
@@ -834,7 +835,10 @@
       }
       // 처음 하는 사람은 첫 조합을 터뜨릴 때까지 기다려 줘요. 꼭대기 가까이 차면 천천히 올라와요.
       if (S.feverUntil > 0 && !feverOn()) endFever();
-      if (!S.tutorial && !feverOn()) S.riseIn -= inDanger() ? dt / SLOW_DANGER : dt;
+      if (!S.tutorial && !feverOn()) {
+        const left = S.cols.reduce((a, col) => a + col.length, 0);
+        S.riseIn -= inDanger() ? dt / SLOW_DANGER : left < SPARSE ? dt * 3 : dt;
+      }
       if (!S.hint && !S.aim && !S.path.length && S.elapsed - S.lastActAt >= HINT_AFTER) showHint();
       if (S.vs) { vsStep(dt); if (S.over) return; }
       if (S.riseIn <= 0) rise(false);
@@ -1161,7 +1165,7 @@
   function makeBot(level, seed) {
     const gen = seeded(seed);
     const pace = { easy: 3.4, normal: 2.5, hard: 1.8 }[level] || 2.5;
-    const B = { name: t('cpu'), alive: true, cols: Array.from({ length: COLS }, () => []), out: 0, pend: [], el: 0, cleared: 0, lvl: 1, riseIn: riseTime(0), actIn: pace + 1.5, combo: 0, lastPop: -99 };
+    const B = { name: t('cpu'), alive: true, cols: Array.from({ length: COLS }, () => []), out: 0, pend: [], el: 0, cleared: 0, lvl: 1, riseIn: riseTime(1), actIn: pace + 1.5, combo: 0, lastPop: -99 };
     const push = (special, g) => { makeRow(special, g, B.lvl).forEach((cell, c) => B.cols[c].unshift(cell)); if (overflow(B.cols)) B.alive = false; };
     for (let i = 0; i < START_ROWS; i++) push(false, gen);
     const attack = k => {
@@ -1195,15 +1199,16 @@
       thaw(B.cols, gone);
       B.cols = B.cols.map(col => col.filter(x => !gone.includes(x)));
       B.cleared += gone.length;
-      B.riseIn = Math.min(riseTime(B.el), B.riseIn + POP_BONUS);
+      B.riseIn = Math.min(riseTime(B.lvl), B.riseIn + POP_BONUS);
       attack(lines);
     }
     B.step = dt => {
       if (!B.alive) return;
       B.el += dt;
-      B.lvl = levelOf(B.el);
-      B.riseIn -= B.cols.some(col => col.length >= ROWS - 1) ? dt / SLOW_DANGER : dt;
-      if (B.riseIn <= 0) { push(true, gen); B.riseIn = riseTime(B.el); }
+      B.lvl = levelOf(B.cleared);
+      const left = B.cols.reduce((a, col) => a + col.length, 0);
+      B.riseIn -= B.cols.some(col => col.length >= ROWS - 1) ? dt / SLOW_DANGER : left < SPARSE ? dt * 3 : dt;
+      if (B.riseIn <= 0) { push(true, gen); B.riseIn = riseTime(B.lvl); }
       while (B.alive && B.pend.length && B.el >= B.pend[0].due) { const p = B.pend.shift(); for (let i = 0; i < p.n && B.alive; i++) push(false, Math.random); }
       B.actIn -= dt;
       if (B.alive && B.actIn <= 0) { B.actIn = pace * (0.7 + Math.random() * 0.6); act(); }
