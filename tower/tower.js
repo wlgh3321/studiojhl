@@ -43,7 +43,7 @@
       studio: '◀ JHL STUDIO', nameKo: '텐 타워',
       rule1: '숫자를 이어서 <b>합 10</b>을 만들면 펑!',
       rule2: '붙어 있는 숫자끼리 이어요.',
-      rule2b: '사이가 비면 멀리서도 OK!',
+      rule2b: '사이가 비어 있으면 멀리 있어도 OK!',
       rule3: '꼭대기에 닿으면 끝!',
       nextRow: '다음 줄', upShort: '한 줄 올리기', sec: '초',
       modeSolo: '혼자 플레이', modeDaily: '오늘의 탑', modeCpu: '컴퓨터 대전', modeNet: '친구 대전',
@@ -87,7 +87,7 @@
       studio: '◀ JHL STUDIO', nameKo: 'Make 10. Pop the tower.',
       rule1: 'Connect numbers to make <b>10</b>. Pop!',
       rule2: 'Connect numbers that touch.',
-      rule2b: 'Gaps in a row are OK!',
+      rule2b: 'Empty gaps in a row are OK!',
       rule3: "Don't let it reach the top!",
       nextRow: 'Next row', upShort: 'Raise a row', sec: 's',
       modeSolo: 'Solo', modeDaily: 'Daily Tower', modeCpu: 'vs CPU', modeNet: 'vs Friend',
@@ -220,22 +220,20 @@
   let CELL = 56;
   function layout() {
     const vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-    const inner = Math.min(window.innerWidth - 24, 420) - 30 - 8; // 판 안쪽 폭(판 테두리·빨간 틀 빼고)
-    const byW = Math.floor((inner - 4) / COLS);
+    const inner = Math.min(window.innerWidth - 20, 420) - 26; // 창 안쪽 폭
+    const byW = (inner - 6) / COLS;
+    const byH = (vh - 236 - (isVs() ? (vh <= 700 ? 64 : 76) : 0)) / ROWS;
+    CELL = Math.max(28, Math.floor(Math.min(byW, byH, 62)));
     const root = document.documentElement;
-    const set = c => { CELL = Math.max(26, Math.min(c, byW, 62)); root.style.setProperty('--cell', CELL + 'px'); };
-    set(Math.floor((vh - 262 - (isVs() ? 70 : 0)) / ROWS));
+    root.style.setProperty('--cell', CELL + 'px');
+    // 실제로 화면을 넘치면 넘치지 않을 때까지 한 칸씩 줄여요.
     const game = $('game');
     if (!game.classList.contains('active')) return;
-    // 판을 뺀 나머지 높이를 실제로 재서, 남는 높이에 판을 꽉 맞춰요.
-    const board = $('board');
-    const cs = getComputedStyle(game);
-    const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
-    const rest = game.firstElementChild.offsetHeight + pad + 4 - board.offsetHeight; // 4: 판 아래 그림자
-    set(Math.floor((vh - rest - 2) / ROWS));
-    for (let i = 0; i < 12 && CELL > 26 && game.scrollHeight > vh + 1; i++) set(CELL - 1);
+    for (let i = 0; i < 12 && CELL > 28 && game.scrollHeight > vh + 1; i++) {
+      CELL -= 1;
+      root.style.setProperty('--cell', CELL + 'px');
+    }
   }
-
 
 
   /* ---------- 게임 상태 ---------- */
@@ -1062,7 +1060,7 @@
     $('vsPend').className = 'vs-pend' + (soon ? ' soon' : '');
     $('vsPend').innerHTML = total ? '<i></i>'.repeat(Math.min(total, 8)) + (total > 8 ? `<b>+${total - 8}</b>` : '') : '<span>-</span>';
   }
-  const OPP_COLORS = ['', '#ffb9c2', '#f6e27f', '#b7e6df', '#d9c8f7', '#fffbea', '#9a72e2', '#4db6b2', '#f7862a', '#e2382f'];
+  const OPP_COLORS = ['', '#f5bfcc', '#f6d36b', '#a9d8e4', '#bfe3b4', '#c9b6e4', '#2e8b7e', '#3b6fb6', '#ee8a3a', '#e2472d'];
   function drawOpp() {
     const cv = $('oppCv');
     const g = cv.getContext('2d');
@@ -1075,7 +1073,7 @@
       top = Math.max(top, col.length);
       for (let r = 0; r < Math.min(col.length, ROWS); r++) {
         const x = col[r];
-        g.fillStyle = x.kind === 'star' ? '#ffffff' : x.kind === 'bomb' ? '#172957' : OPP_COLORS[x.v];
+        g.fillStyle = x.kind === 'star' ? '#fbf4e2' : x.kind === 'bomb' ? '#1d3445' : OPP_COLORS[x.v];
         g.fillRect(c * u + 1, (ROWS - 1 - r) * u + 1, u - 2, u - 2);
       }
     }
