@@ -53,7 +53,7 @@
       hofOff: '지금은 순위표를 불러올 수 없어요',
       sumsum: '셈셈 놀이터', privacy: '개인정보처리방침',
       score: '점수', level: '레벨', best: '최고',
-      hint: '숫자를 누르거나 그어서 이어요',
+      hint: '숫자를 그어서 이어요',
       hintTut: '반짝이는 숫자를 눌러 10을 만들어 보세요',
       shuffled: '섞었어요!', longChain: 'LONG CHAIN +200',
       pauseNote: '시간이 멈췄어요. 준비되면 계속하세요.',
@@ -220,19 +220,21 @@
   let CELL = 56;
   function layout() {
     const vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-    const inner = Math.min(window.innerWidth - 20, 420) - 26; // 창 안쪽 폭
-    const byW = (inner - 6) / COLS;
-    const byH = (vh - 236 - (isVs() ? (vh <= 700 ? 64 : 76) : 0)) / ROWS;
-    CELL = Math.max(28, Math.floor(Math.min(byW, byH, 62)));
+    const inner = Math.min(window.innerWidth - 24, 420) - 27; // 콘솔 안쪽 폭
+    const byW = Math.floor((inner - 3) / COLS);
     const root = document.documentElement;
-    root.style.setProperty('--cell', CELL + 'px');
-    // 실제로 화면을 넘치면 넘치지 않을 때까지 한 칸씩 줄여요.
+    const set = c => { CELL = Math.max(26, Math.min(c, byW, 62)); root.style.setProperty('--cell', CELL + 'px'); };
+    set(Math.floor((vh - 262 - (isVs() ? 70 : 0)) / ROWS));
     const game = $('game');
     if (!game.classList.contains('active')) return;
-    for (let i = 0; i < 12 && CELL > 28 && game.scrollHeight > vh + 1; i++) {
-      CELL -= 1;
-      root.style.setProperty('--cell', CELL + 'px');
-    }
+    // 판을 뺀 나머지 높이를 실제로 재서, 화면에 꼭 맞게 칸 크기를 정해요.
+    const con = game.firstElementChild;
+    const board = $('board');
+    const cs = getComputedStyle(game);
+    const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const rest = con.offsetHeight + pad - board.offsetHeight;
+    set(Math.floor((vh - rest - 2) / ROWS));
+    for (let i = 0; i < 12 && CELL > 26 && con.offsetHeight + pad > vh + 1; i++) set(CELL - 1);
   }
 
 
@@ -495,8 +497,9 @@
   /* ---------- 입력: 끌어서 잇기 + 하나씩 눌러 잇기 ---------- */
   function hit(e, inner) {
     const r = $('board').getBoundingClientRect();
-    const x = e.clientX - r.left - 3;
-    const y = e.clientY - r.top - 3;
+    const bd = $('board');
+    const x = e.clientX - r.left - bd.clientLeft;
+    const y = e.clientY - r.top - bd.clientTop;
     const c = Math.floor(x / CELL);
     const top = Math.floor(y / CELL);
     if (c < 0 || c >= COLS || top < 0 || top >= ROWS) return null;
@@ -1060,7 +1063,7 @@
     $('vsPend').className = 'vs-pend' + (soon ? ' soon' : '');
     $('vsPend').innerHTML = total ? '<i></i>'.repeat(Math.min(total, 8)) + (total > 8 ? `<b>+${total - 8}</b>` : '') : '<span>-</span>';
   }
-  const OPP_COLORS = ['', '#f5bfcc', '#f6d36b', '#a9d8e4', '#bfe3b4', '#c9b6e4', '#2e8b7e', '#3b6fb6', '#ee8a3a', '#e2472d'];
+  const OPP_COLORS = ['', '#f6c9d7', '#f8de8a', '#cde9f1', '#d5ecc9', '#ece4f6', '#6fb36c', '#5aa9c4', '#f2a23c', '#e8553e'];
   function drawOpp() {
     const cv = $('oppCv');
     const g = cv.getContext('2d');
@@ -1073,7 +1076,7 @@
       top = Math.max(top, col.length);
       for (let r = 0; r < Math.min(col.length, ROWS); r++) {
         const x = col[r];
-        g.fillStyle = x.kind === 'star' ? '#fbf4e2' : x.kind === 'bomb' ? '#1d3445' : OPP_COLORS[x.v];
+        g.fillStyle = x.kind === 'star' ? '#f2b640' : x.kind === 'bomb' ? '#26324a' : OPP_COLORS[x.v];
         g.fillRect(c * u + 1, (ROWS - 1 - r) * u + 1, u - 2, u - 2);
       }
     }
