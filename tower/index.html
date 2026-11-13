@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#f3f5ff">
+  <meta name="theme-color" content="#3e8e86">
   <title>텐 타워 · 숫자를 이어 10을 만들어요 | JHL STUDIO</title>
-  <meta name="description" content="이웃한 숫자를 이어서 합 10을 만들면 펑! 올라오는 숫자 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요. 설치 없이 바로 하는 무료 웹게임.">
+  <meta name="description" content="붙어 있는 숫자를 이어서 합 10을 만들면 펑! 올라오는 숫자 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요. 매일 바뀌는 오늘의 탑, 컴퓨터·친구와 겨루는 1:1 대전까지, 설치 없이 바로 하는 무료 숫자 퍼즐 웹게임.">
   <link rel="canonical" href="https://studiojhl.com/tower/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
@@ -13,54 +13,72 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="JHL STUDIO">
   <meta property="og:title" content="텐 타워 · 숫자를 이어 10을 만들어요">
-  <meta property="og:description" content="이웃한 숫자를 이어서 합 10을 만들면 펑! 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요.">
+  <meta property="og:description" content="숫자를 이어서 합 10을 만들면 펑! 탑이 꼭대기에 닿기 전에 최대한 많이 터뜨리세요.">
   <meta property="og:url" content="https://studiojhl.com/tower/">
   <meta property="og:image" content="https://studiojhl.com/tower/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
-  <link rel="stylesheet" href="tower.css?v=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@700;900&family=IBM+Plex+Sans+KR:wght@500;700&family=Rubik:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tower.css?v=9">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6048734887508367" crossorigin="anonymous"></script>
 </head>
 <body>
 
 <!-- ===== 첫 화면 ===== -->
 <section id="title" class="screen active">
-  <div class="top-bar">
+  <header class="top-bar">
     <a class="back" href="/" data-t="studio">◀ JHL STUDIO</a>
     <div class="top-btns">
       <button type="button" class="chip" id="soundBtn" aria-pressed="true">♪ ON</button>
       <button type="button" class="chip" id="langBtn">EN</button>
     </div>
+  </header>
+
+  <div class="title-logo">
+    <picture>
+      <source srcset="ten-tower-logo.webp" type="image/webp">
+      <img src="ten-tower-logo.png" alt="TEN TOWER" width="744" height="480" fetchpriority="high">
+    </picture>
+  </div>
+  <p class="tagline" data-t="rule1">숫자를 이어서 <b>합 10</b>을 만들면 펑!</p>
+
+  <!-- 놀이 메뉴: 옛날 컴퓨터 창 모양 -->
+  <div class="win menu-win">
+    <div class="win-bar bar-red"><span class="win-name">PLAY.EXE</span><span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="win-body">
+      <button type="button" class="btn btn-start" id="startBtn"><span class="play" aria-hidden="true"></span><span data-t="start">게임 시작</span></button>
+      <div class="mode-row">
+        <button type="button" class="mode-card m-daily" id="dailyBtn">
+          <span class="mode-icon cal" aria-hidden="true"><b id="todayNum">1</b></span>
+          <span class="mode-copy"><span class="mc-title" data-t="daily">오늘의 탑</span><span class="mc-sub" data-t="dailySub">오늘은 모두 같은 판</span></span>
+        </button>
+        <button type="button" class="mode-card m-vs" id="vsBtn">
+          <span class="mode-icon vs-icon" aria-hidden="true">VS</span>
+          <span class="mode-copy"><span class="mc-title" data-t="vs">대전하기</span><span class="mc-sub" data-t="vsSub">컴퓨터 · 친구와 1:1</span></span>
+        </button>
+      </div>
+      <ul class="rules">
+        <li><span class="pics"><i class="b n3">3</i><i class="b n7">7</i></span><span data-t="rule2">붙어 있는 숫자끼리 이어요.</span></li>
+        <li><span class="pics"><i class="b n4">4</i><i class="gap" aria-hidden="true"></i><i class="b n6">6</i></span><span data-t="rule2b">사이가 비어 있으면 멀리 있어도 OK!</span></li>
+        <li><span class="pics"><i class="b n9">9</i><i class="b n1">1</i></span><span data-t="rule3">꼭대기에 닿으면 끝!</span></li>
+      </ul>
+      <p class="best-line"><span data-t="myBest">내 최고 기록</span><b id="titleBest">0</b></p>
+    </div>
   </div>
 
-  <div class="logo-wrap">
-    <div class="logo-blocks" aria-hidden="true">
-      <i class="b n4">4</i><i class="b n6">6</i><i class="b n3">3</i><i class="b n7">7</i>
+  <div class="win hof">
+    <div class="win-bar bar-teal"><span class="win-name hof-title" data-t="hof">탑 랭킹</span><span class="hof-top">TOP 10</span><span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="win-body">
+      <div class="hof-tabs">
+        <button type="button" class="chip hof-tab" data-tab="all" aria-pressed="true" data-t="tabAll">전체 기록</button>
+        <button type="button" class="chip hof-tab" data-tab="daily" aria-pressed="false" data-t="tabDaily">오늘의 탑</button>
+      </div>
+      <div class="podium" id="podium" hidden></div>
+      <ol class="hof-list" id="hofList"><li class="hof-msg" data-t="loading">불러오는 중…</li></ol>
     </div>
-    <h1 class="logo">TEN<br>TOWER</h1>
-    <p class="logo-ko" data-t="nameKo">텐 타워</p>
-  </div>
-
-  <div class="card rule-card">
-    <p class="rule-big" data-t="rule1">이웃한 숫자를 이어서 <b>합 10</b>을 만들면 펑!</p>
-    <p class="rule-small" data-t="rule2">탑이 꼭대기에 닿으면 끝나요. 길게 이을수록 점수가 커져요.</p>
-    <div class="demo" aria-hidden="true">
-      <i class="b n2 on">2</i><i class="b n3 on">3</i><i class="b n5 on">5</i><span class="demo-eq">= 10 ✨</span>
-    </div>
-  </div>
-
-  <button type="button" class="btn btn-start" id="startBtn">▶ <span data-t="start">게임 시작</span></button>
-  <p class="best-line"><span data-t="myBest">내 최고 기록</span> <b id="titleBest">0</b></p>
-
-  <div class="card hof">
-    <div class="hof-head">
-      <span class="stage">HALL OF FAME</span>
-      <span class="hof-title" data-t="hof">명예의 전당</span>
-    </div>
-    <ol class="hof-list" id="hofList"><li class="hof-msg" data-t="loading">불러오는 중…</li></ol>
   </div>
 
   <footer class="foot">
@@ -72,31 +90,95 @@
 
 <!-- ===== 게임 ===== -->
 <section id="game" class="screen">
-  <div class="hud">
-    <button type="button" class="btn btn-pause" id="pauseBtn" aria-label="일시정지">Ⅱ</button>
-    <div class="hud-box"><span class="hud-k" data-t="score">점수</span><b id="hudScore">0</b></div>
-    <div class="hud-box"><span class="hud-k" data-t="level">레벨</span><b id="hudLevel">1</b></div>
-    <div class="hud-box"><span class="hud-k" data-t="best">최고</span><b id="hudBest">0</b></div>
-  </div>
+  <div class="win console">
+    <div class="win-bar bar-yellow">
+      <picture class="mini-logo"><source srcset="ten-tower-logo.webp" type="image/webp"><img src="ten-tower-logo.png" alt="TEN TOWER" width="744" height="480"></picture>
+      <span class="win-name" id="gameMode">혼자 플레이</span>
+      <button type="button" class="btn btn-pause" id="pauseBtn" aria-label="일시정지"><i></i><i></i></button>
+    </div>
+    <div class="console-body">
+      <div class="stats">
+        <div class="stat"><span data-t="score">점수</span><b id="hudScore">0</b></div>
+        <div class="stat"><span data-t="level">레벨</span><b id="hudLevel">1</b></div>
+        <div class="stat"><span data-t="best">최고</span><b id="hudBest">0</b></div>
+      </div>
+      <div class="rise">
+        <span class="rise-k" data-t="nextRow">다음 줄</span>
+        <div class="rise-bar"><i id="riseFill"></i></div>
+        <b class="rise-s" id="nextSeconds">8.0</b>
+      </div>
 
-  <div class="rise">
-    <div class="rise-bar"><i id="riseFill"></i></div>
-    <button type="button" class="btn btn-up" id="upBtn" aria-label="한 줄 올리기">▲ UP</button>
-  </div>
+      <div class="vs-strip" id="vsStrip" hidden>
+        <div class="vs-in">
+          <span class="vs-k" data-t="incoming">공격 예고</span>
+          <div class="vs-pend" id="vsPend"><span>-</span></div>
+        </div>
+        <div class="vs-opp">
+          <div class="vs-opp-txt"><span class="vs-k" id="oppName">상대</span><b id="oppState"></b></div>
+          <canvas id="oppCv" width="72" height="120"></canvas>
+        </div>
+      </div>
 
-  <div class="board-wrap">
-    <div class="board" id="board" aria-label="숫자 판"></div>
-    <div class="sum-bubble" id="sumBubble" hidden></div>
-  </div>
+      <div class="board-wrap">
+        <div class="board" id="board" aria-label="숫자 판"><svg class="links" aria-hidden="true"><path id="link" class="link" d=""></path></svg></div>
+      </div>
 
-  <p class="hint" id="hint" data-t="hint">손가락으로 숫자를 이어 그어 보세요</p>
+      <div class="play-foot">
+        <span class="target" aria-hidden="true">10</span>
+        <div class="say">
+          <p class="hint" id="hint">숫자를 누르거나 그어서 이어요</p>
+          <div class="sum-bubble" id="sumBubble" hidden></div>
+        </div>
+        <button type="button" class="btn btn-up" id="upBtn" aria-label="한 줄 올리기"><span class="up-arrow" aria-hidden="true"></span><span data-t="upShort">한 줄 올리기</span></button>
+      </div>
+    </div>
+  </div>
 </section>
+
+<!-- ===== 대전 고르기 ===== -->
+<div id="vsBox" class="modal" hidden>
+  <div class="card modal-card" role="dialog" aria-modal="true" aria-labelledby="vsTitle">
+    <div class="pause-title" id="vsTitle">VS</div>
+    <div id="vsHome">
+      <p class="modal-note" data-t="vsNote">콤보를 쌓아 상대에게 방해 줄을 보내요.<br>먼저 꼭대기에 닿으면 져요.</p>
+      <div class="vs-sec">
+        <h2 data-t="vsCpu">컴퓨터와 대전</h2>
+        <div class="vs-row3">
+          <button type="button" class="btn" data-cpu="easy" data-t="easy">쉬움</button>
+          <button type="button" class="btn" data-cpu="normal" data-t="normal">보통</button>
+          <button type="button" class="btn" data-cpu="hard" data-t="hard">어려움</button>
+        </div>
+      </div>
+      <div class="vs-sec">
+        <h2 data-t="vsFriend">친구와 대전</h2>
+        <input type="text" id="vsName" maxlength="8" autocomplete="nickname" data-t-ph="rankPh" placeholder="닉네임 (8글자까지)">
+        <button type="button" class="btn btn-start" id="vsCreate" data-t="vsCreate">방 만들기</button>
+        <form class="rank-row" id="vsJoinForm">
+          <input type="text" id="vsCode" maxlength="5" autocomplete="off" autocapitalize="characters" data-t-ph="vsCodePh" placeholder="초대 코드">
+          <button type="submit" class="btn" id="vsJoin" data-t="vsJoin">들어가기</button>
+        </form>
+        <p class="rank-hint err" id="vsErr"></p>
+      </div>
+      <button type="button" class="btn btn-ghost" id="vsClose" data-t="vsClose">닫기</button>
+    </div>
+    <div id="vsRoom" hidden>
+      <p class="modal-note" id="vsRoomMsg"></p>
+      <div class="vs-code" id="vsRoomCode">-----</div>
+      <div class="vs-players"><span id="vsP0"></span><b>VS</b><span id="vsP1"></span></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-start" id="vsStart" data-t="vsStart">대전 시작</button>
+        <button type="button" class="btn" id="vsInvite" data-t="vsInvite">초대 링크 보내기</button>
+        <button type="button" class="btn btn-ghost" id="vsLeave" data-t="vsLeave">방 나가기</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ===== 일시정지 ===== -->
 <div id="pauseBox" class="modal" hidden>
   <div class="card modal-card" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
     <div class="pause-title" id="pauseTitle">PAUSE</div>
-    <p class="modal-note" data-t="pauseNote">시간이 멈췄어요. 준비되면 계속하세요.</p>
+    <p class="modal-note" id="pauseNote" data-t="pauseNote">시간이 멈췄어요. 준비되면 계속하세요.</p>
     <div class="modal-actions">
       <button type="button" class="btn btn-start" id="resumeBtn" data-t="resume">계속하기</button>
       <button type="button" class="btn" id="restartBtn" data-t="restart">처음부터 다시</button>
@@ -140,6 +222,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
-<script src="tower.js?v=1"></script>
+<script src="tower.js?v=9"></script>
 </body>
 </html>
