@@ -322,9 +322,14 @@ a { color: inherit; }
 .cell.pop { transition: none; }
 .cell.pop { z-index: 4; }
 .cell.pop .b { animation: pop 0.24s ease-out forwards; }
-@keyframes pop { 0% { transform: scale(1.12); filter: brightness(1.9) saturate(0.4); } 35% { transform: scale(1.2); filter: brightness(1.5); } to { transform: scale(0.3); opacity: 0; filter: brightness(1.2); } }
+@keyframes pop { 0% { transform: scale(1.12); } 35% { transform: scale(1.2); } to { transform: scale(0.3); opacity: 0; } }
+/* 번쩍: 흰 막을 겹쳐요(필터보다 훨씬 가벼워요) */
+.cell.hit .b, .cell.pop .b { position: relative; }
+.cell.hit .b::before, .cell.pop .b::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; opacity: 0.75; }
+.cell.pop .b::before { animation: flash 0.2s ease-out forwards; }
+@keyframes flash { to { opacity: 0; } }
 .cell.hit { z-index: 4; }
-.cell.hit .b { transform: scale(1.12); filter: brightness(1.9) saturate(0.4); transition: none; }
+.cell.hit .b { transform: scale(1.12); transition: none; }
 .cell.tap .b { animation: tap 0.2s cubic-bezier(0.3, 1.8, 0.5, 1); }
 @keyframes tap { 0% { transform: scale(0.76); } 100% { transform: scale(0.9); } }
 
@@ -360,8 +365,7 @@ a { color: inherit; }
 .board.aiming .cell .b { opacity: 0.85; }
 .rise-bar.slow i { background: var(--sky); }
 .rise-bar.fever i { background: repeating-linear-gradient(90deg, var(--mustard) 0 8px, var(--butter) 8px 16px); }
-.board.fever { background: #fff3cc; box-shadow: 0 0 0 3px var(--mustard); animation: fever 0.6s ease-in-out infinite; }
-@keyframes fever { 50% { box-shadow: 0 0 0 5px var(--butter); } }
+.board.fever { background: #fff3cc; box-shadow: 0 0 0 4px var(--mustard); }
 .cell.ice .b { position: relative; }
 .cell.ice .b::after {
   content: "";
@@ -518,26 +522,7 @@ a { color: inherit; }
 @keyframes cd { from { transform: scale(1.8); opacity: 0; } }
 
 .fx { position: fixed; inset: 0; pointer-events: none; z-index: 45; overflow: hidden; }
-.fx-bit {
-  position: absolute;
-  margin: -5px 0 0 -5px;
-  border: 1.5px solid var(--ink);
-  border-radius: 3px;
-  animation: bit 0.55s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
-}
-@keyframes bit {
-  to { transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(var(--r)) scale(0.4); opacity: 0; }
-}
-.fx-ring {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 3px solid;
-  border-radius: 50%;
-  animation: ring 0.4s ease-out forwards;
-}
-@keyframes ring { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(4.2); opacity: 0; border-width: 1px; } }
+.fx-cv { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 44; }
 .fx-combo {
   position: absolute;
   transform: translate(-50%, -50%);

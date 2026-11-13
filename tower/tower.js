@@ -706,44 +706,96 @@
   }
 
   /* ---------- 손맛 효과 ---------- */
+  // 조각·물결은 캔버스 한 장에 그려요(요소를 많이 만들면 휴대폰에서 버벅여요).
+  const parts = [];
+  const rings = [];
+  let fxCv = null, fxG = null, fxRaf = 0, fxLast = 0, fxDpr = 1;
+  function fxCanvas() {
+    if (!fxCv) {
+      fxCv = document.createElement('canvas');
+      fxCv.className = 'fx-cv';
+      document.body.appendChild(fxCv);
+      fxG = fxCv.getContext('2d');
+    }
+    fxDpr = 1; // 조각은 작아서 저해상도로도 충분해요(훨씬 가벼워요)
+    const w = window.innerWidth, h = window.innerHeight;
+    if (fxCv.width !== Math.round(w * fxDpr) || fxCv.height !== Math.round(h * fxDpr)) {
+      fxCv.width = Math.round(w * fxDpr);
+      fxCv.height = Math.round(h * fxDpr);
+    }
+  }
   function burst(x, y, color, count, power) {
     if (calm()) return;
-    const fx = $('fx');
+    fxCanvas();
     for (let i = 0; i < count; i++) {
       const a = (Math.PI * 2 * i) / count + Math.random() * 0.6;
-      const d = power * (0.6 + Math.random() * 0.6);
-      const p = document.createElement('i');
-      p.className = 'fx-bit';
-      p.style.left = x + 'px';
-      p.style.top = y + 'px';
-      p.style.background = color;
-      const sz = 7 + Math.random() * 7;
-      p.style.width = p.style.height = sz + 'px';
-      p.style.setProperty('--dx', Math.cos(a) * d + 'px');
-      p.style.setProperty('--dy', Math.sin(a) * d - power * 0.3 + 'px');
-      p.style.setProperty('--r', (Math.random() * 360 - 180) + 'deg');
-      fx.appendChild(p);
-      setTimeout(() => p.remove(), 560);
+      const v = power * (2.2 + Math.random() * 2.2);
+      parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - power * 1.6, s: 7 + Math.random() * 7, r: Math.random() * 6, vr: Math.random() * 14 - 7, c: color, life: 0.55 });
     }
-    const ring = document.createElement('i');
-    ring.className = 'fx-ring';
-    ring.style.left = x + 'px';
-    ring.style.top = y + 'px';
-    ring.style.borderColor = color;
-    fx.appendChild(ring);
-    setTimeout(() => ring.remove(), 420);
+    if (parts.length > 160) parts.splice(0, parts.length - 160);
+    rings.push({ x, y, c: color, life: 0.4 });
+    if (!fxRaf) { fxLast = performance.now(); fxRaf = requestAnimationFrame(fxTick); }
+  }
+  function fxTick(now) {
+    const dt = Math.min(0.05, (now - fxLast) / 1000);
+    fxLast = now;
+    const g = fxG;
+    g.setTransform(fxDpr, 0, 0, fxDpr, 0, 0);
+    g.clearRect(0, 0, fxCv.width, fxCv.height);
+    g.lineWidth = 1.5;
+    g.strokeStyle = '#26324a';
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.life -= dt;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      p.vy += 900 * dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.r += p.vr * dt;
+      const k = p.life / 0.55;
+      const sz = p.s * (0.4 + 0.6 * k);
+      g.globalAlpha = Math.min(1, k * 1.6);
+      g.fillStyle = '#26324a';
+      g.fillRect(p.x - sz / 2 - 1, p.y - sz / 2 - 1, sz + 2, sz + 2);
+      g.fillStyle = p.c;
+      g.fillRect(p.x - sz / 2, p.y - sz / 2, sz, sz);
+    }
+    for (let i = rings.length - 1; i >= 0; i--) {
+      const r = rings[i];
+      r.life -= dt;
+      if (r.life <= 0) { rings.splice(i, 1); continue; }
+      const k = 1 - r.life / 0.4;
+      g.globalAlpha = 0.9 * (1 - k);
+      g.strokeStyle = r.c;
+      g.lineWidth = 3 * (1 - k) + 1;
+      g.beginPath();
+      g.arc(r.x, r.y, 6 + k * 38, 0, Math.PI * 2);
+      g.stroke();
+      g.strokeStyle = '#26324a';
+      g.lineWidth = 1.5;
+    }
+    g.globalAlpha = 1;
+    if (parts.length || rings.length) fxRaf = requestAnimationFrame(fxTick);
+    else { fxRaf = 0; g.clearRect(0, 0, fxCv.width, fxCv.height); }
   }
   // 칸 하나를 터뜨리는 모양(번쩍 → 조각). 요소는 상태와 따로 잠시 남아 있다가 사라져요.
-  function shatter(cell, power) {
+  const BLOCK_COLORS = ['', '#f6c9d7', '#f8de8a', '#cde9f1', '#d5ecc9', '#ece4f6', '#6fb36c', '#5aa9c4', '#f2a23c', '#e8553e'];
+  // 칸의 화면 위치(판 위치 한 번만 재요). pos는 지우기 전에 기억해 둔 [열, 줄].
+  let boardRect = null;
+  function cellXY(cell, pos) {
+    const bd = $('board');
+    const r = boardRect || bd.getBoundingClientRect();
+    const [c, row] = pos.get(cell);
+    return [r.left + bd.clientLeft + (c + 0.5) * CELL, r.top + bd.clientTop + (ROWS - 1 - row + 0.5) * CELL];
+  }
+  function shatter(cell, power, pos) {
     const el = els.get(cell.id);
     if (!el) return;
     els.delete(cell.id);
     el.classList.remove('sel', 'ok', 'over', 'tap');
     el.classList.add('pop');
-    const b = el.querySelector('.b');
-    const r = el.getBoundingClientRect();
-    const color = b ? getComputedStyle(b).backgroundColor : '#f2b640';
-    burst(r.left + r.width / 2, r.top + r.height / 2, color, 7, power);
+    const [x, y] = cellXY(cell, pos);
+    burst(x, y, cell.kind === 'n' ? BLOCK_COLORS[cell.v] : cell.kind === 'star' ? '#f2b640' : '#26324a', 6, power);
     setTimeout(() => el.remove(), 300);
   }
   function shake(kind) {
@@ -890,16 +942,19 @@
 
     // 점수 글자는 터진 칸들의 가운데에 띄워요.
     let sx = 0, sy = 0;
+    const bd0 = $('board');
+    const br0 = bd0.getBoundingClientRect();
     for (const cell of path) {
-      const r = els.get(cell.id).getBoundingClientRect();
-      sx += r.left + r.width / 2;
-      sy += r.top + r.height / 2;
+      sx += br0.left + bd0.clientLeft + (cell.c + 0.5) * CELL;
+      sy += br0.top + bd0.clientTop + (ROWS - 1 - rowOf(cell) + 0.5) * CELL;
     }
     const heavy = n >= 4;
     const cx = sx / n, cy = sy / n;
+    const pos = new Map(path.map(cell => [cell, [cell.c, rowOf(cell)]]));
+    boardRect = $('board').getBoundingClientRect();
     // 큰 연결은 아주 잠깐 멈췄다가(히트 스톱) 터져요.
     const doPop = () => {
-      for (const cell of path) shatter(cell, heavy ? 70 : 52);
+      for (const cell of path) shatter(cell, heavy ? 70 : 52, pos);
       fxAt(cx, cy, mult > 1 ? `+${pts} ×${mult}` : `+${pts}`, heavy || mult >= 3);
       if (S.combo >= 2) comboFx(cx, cy - 48, S.combo);
       sfx.pop(n, S.combo);
@@ -954,6 +1009,8 @@
     S.lastActAt = S.elapsed;
     S.riseIn = Math.min(S.riseMax, S.riseIn + POP_BONUS);
     clearHint();
+    const pos = new Map(hitCells.map(cell => [cell, [cell.c, rowOf(cell)]]));
+    boardRect = $('board').getBoundingClientRect();
     for (const cell of hitCells) {
       const col = S.cols[cell.c];
       col.splice(col.indexOf(cell), 1);
@@ -962,7 +1019,7 @@
     renderPath();
     for (const cell of hitCells) { const el = els.get(cell.id); if (el) el.classList.add('hit'); }
     const doBlast = () => {
-      for (const cell of hitCells) shatter(cell, 90);
+      for (const cell of hitCells) shatter(cell, 90, pos);
       burst(x, y, '#e8553e', 12, 120);
       fxAt(x, y, `+${pts}`, true);
       sfx.boom();
@@ -1026,7 +1083,7 @@
       $('riseFill').parentElement.classList.toggle('hurry', S.riseIn < 1.5);
       $('riseFill').parentElement.classList.toggle('slow', inDanger());
       $('riseFill').parentElement.classList.toggle('fever', feverOn());
-      if (!S.tutorial && !S.path.length && !S.aim && !S.dragging) coachCheck();
+      if (!S.tutorial && !S.path.length && !S.aim && !S.dragging && (S.coachAt = (S.coachAt || 0) + dt) > 0.25) { S.coachAt = 0; coachCheck(); }
     }
     raf = requestAnimationFrame(loop);
   }
@@ -1079,7 +1136,11 @@
     }
     return null;
   }
+  let coachLeft = true;
   function coachCheck() {
+    if (!coachLeft) return;
+    coachLeft = COACH.some(k => !coachSeen(k));
+    if (!coachLeft) return;
     if (S.coach || (S.vs && S.vs.kind === 'net')) return; // 온라인 대전은 멈출 수 없어서 건너뛰어요
     if (performance.now() - (S.drawnAt || 0) < 300) return; // 칸이 움직이는 중이면 멈춘 뒤에 보여 줘요
     for (const k of COACH) {
