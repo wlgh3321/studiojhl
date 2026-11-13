@@ -23,7 +23,7 @@
   const P_BOMB = 0.015;
   const P_STAR = 0.03;
   const HINT_AFTER = 5; // 이만큼(초) 못 터뜨리면 힌트
-  const GAUGE_MAX = 10;   // 폭탄 게이지가 다 차는 양
+  const GAUGE_MAX = 16;   // 폭탄 게이지가 다 차는 양
   const POP_BONUS = 0.6;  // 한 번 터뜨릴 때마다 다음 줄이 늦게 오는 시간(초)
   const LEVEL_SEC = 40;   // 이만큼(초)마다 레벨이 올라요
   const SLOW_DANGER = 1.5; // 위험할 때 줄이 이만큼 느리게 올라와요
@@ -497,7 +497,8 @@
   }
   function charge(n) {
     if (S.gauge >= GAUGE_MAX) return;
-    S.gauge = Math.min(GAUGE_MAX, S.gauge + (n - 1) + Math.min(S.combo - 1, 3));
+    // 한 번에 1칸, 콤보 ×3부터 +1, 4개 이상 이으면 +1
+    S.gauge = Math.min(GAUGE_MAX, S.gauge + 1 + (S.combo >= 3 ? 1 : 0) + (n >= 4 ? 1 : 0));
     if (S.gauge >= GAUGE_MAX) {
       sfx.level();
       if (store.get(KEY.bombTip, '') !== '1') { store.set(KEY.bombTip, '1'); toast(t('bombReady')); }
