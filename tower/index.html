@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@500;700&family=Rubik:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="tower.css?v=20">
+  <link rel="stylesheet" href="tower.css?v=21">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6048734887508367" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -89,7 +89,20 @@
   <div class="card console">
     <div class="con-top">
       <picture class="mini-logo"><source srcset="ten-tower-logo.webp" type="image/webp"><img src="ten-tower-logo.png" alt="TEN TOWER" width="744" height="480"></picture>
-      <span class="mode-name" id="gameMode">혼자 플레이</span>
+      <div class="con-mid">
+        <svg class="tenny" id="tenny" data-mood="idle" viewBox="0 0 36 36" aria-hidden="true">
+          <g class="t-body">
+            <rect x="4" y="6" width="28" height="26" rx="8" fill="#f2b640" stroke="#26324a" stroke-width="1.8"/>
+            <path d="M14 6.5 L18 2.5 L22 6.5" fill="#e8553e" stroke="#26324a" stroke-width="1.6" stroke-linejoin="round"/>
+            <g class="f f-idle"><circle cx="13" cy="17" r="2" fill="#26324a"/><circle cx="23" cy="17" r="2" fill="#26324a"/><path d="M14.5 23 Q18 26 21.5 23" fill="none" stroke="#26324a" stroke-width="1.8" stroke-linecap="round"/></g>
+            <g class="f f-happy"><path d="M10.5 18 Q13 14.5 15.5 18 M20.5 18 Q23 14.5 25.5 18" fill="none" stroke="#26324a" stroke-width="1.8" stroke-linecap="round"/><path d="M13.5 22 Q18 28.5 22.5 22 Z" fill="#26324a"/></g>
+            <g class="f f-worry"><circle cx="13" cy="18" r="2" fill="#26324a"/><circle cx="23" cy="18" r="2" fill="#26324a"/><path d="M14 25 Q16 23.5 18 25 T22 25" fill="none" stroke="#26324a" stroke-width="1.8" stroke-linecap="round"/><path d="M29 9 Q31 12.5 29 13.5 Q27 12.5 29 9 Z" fill="#cde9f1" stroke="#26324a" stroke-width="1"/></g>
+            <g class="f f-panic"><circle cx="13" cy="17" r="3" fill="#fff" stroke="#26324a" stroke-width="1.6"/><circle cx="23" cy="17" r="3" fill="#fff" stroke="#26324a" stroke-width="1.6"/><circle cx="13" cy="17" r="1.2" fill="#26324a"/><circle cx="23" cy="17" r="1.2" fill="#26324a"/><ellipse cx="18" cy="25" rx="2.4" ry="3" fill="#26324a"/></g>
+            <g class="f f-sad"><path d="M10.5 16.5 L15.5 18 M25.5 16.5 L20.5 18" stroke="#26324a" stroke-width="1.8" stroke-linecap="round"/><path d="M14.5 25.5 Q18 22.5 21.5 25.5" fill="none" stroke="#26324a" stroke-width="1.8" stroke-linecap="round"/></g>
+          </g>
+        </svg>
+        <span class="mode-name" id="gameMode">혼자 플레이</span>
+      </div>
       <button type="button" class="btn btn-pause" id="pauseBtn" aria-label="일시정지"><i></i><i></i></button>
     </div>
     <div class="stats">
@@ -168,6 +181,15 @@
   </div>
 </div>
 
+<!-- ===== 강화 카드 고르기 ===== -->
+<div id="cardBox" class="modal" hidden>
+  <div class="card modal-card card-pick" role="dialog" aria-modal="true" aria-labelledby="cardLevel">
+    <div class="pause-title" id="cardLevel">LEVEL 2</div>
+    <p class="modal-note" data-t="cardTitle">카드를 한 장 골라요</p>
+    <div class="card-list" id="cardList"></div>
+  </div>
+</div>
+
 <!-- ===== 처음 보는 아이템 설명 ===== -->
 <div id="coach" class="coach" hidden>
   <div class="coach-spot" id="coachSpot"></div>
@@ -183,6 +205,7 @@
   <div class="card modal-card" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
     <div class="pause-title" id="pauseTitle">PAUSE</div>
     <p class="modal-note" id="pauseNote" data-t="pauseNote">시간이 멈췄어요. 준비되면 계속하세요.</p>
+    <div class="my-cards" id="pauseCards" hidden></div>
     <div class="modal-actions">
       <button type="button" class="btn btn-start" id="resumeBtn" data-t="resume">계속하기</button>
       <button type="button" class="btn" id="restartBtn" data-t="restart">처음부터 다시</button>
@@ -226,6 +249,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
-<script src="tower.js?v=20"></script>
+<script src="tower.js?v=21"></script>
 </body>
 </html>

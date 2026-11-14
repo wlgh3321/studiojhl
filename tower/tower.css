@@ -228,7 +228,21 @@ a { color: inherit; }
 }
 .con-top { display: grid; grid-template-columns: 58px 1fr 58px; align-items: center; gap: 8px; }
 .mini-logo img { display: block; width: 58px; height: auto; }
-.mode-name { min-width: 0; text-align: center; font-family: var(--head); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.con-mid { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
+.mode-name { min-width: 0; font-family: var(--head); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 텐이: 판 상황에 따라 표정이 바뀌어요 */
+.tenny { flex: none; width: 34px; height: 34px; overflow: visible; }
+.tenny .f { display: none; }
+.tenny[data-mood="idle"] .f-idle, .tenny[data-mood="happy"] .f-happy, .tenny[data-mood="happy-l"] .f-happy,
+.tenny[data-mood="worry"] .f-worry, .tenny[data-mood="panic"] .f-panic, .tenny[data-mood="sad"] .f-sad { display: inline; }
+.tenny .t-body { transform-origin: 18px 32px; }
+.tenny.hop .t-body { animation: hop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes hop { 30% { transform: translateY(-6px) scale(1.05, 0.95); } 60% { transform: translateY(0) scale(1.08, 0.92); } }
+.tenny[data-mood="happy-l"] .t-body { animation: dance 0.5s ease-in-out infinite; }
+@keyframes dance { 25% { transform: rotate(-8deg) translateY(-2px); } 75% { transform: rotate(8deg) translateY(-2px); } }
+.tenny[data-mood="panic"] .t-body { animation: tremble 0.18s linear infinite; }
+@keyframes tremble { 25% { transform: translateX(-1.5px); } 75% { transform: translateX(1.5px); } }
+.tenny[data-mood="sad"] .t-body { transform: translateY(2px) scale(1.04, 0.96); }
 .btn-pause.btn { justify-self: end; min-height: 0; width: 36px; height: 36px; padding: 0; gap: 4px; border-radius: 10px; }
 .btn-pause i { width: 4px; height: 12px; border-radius: 1px; background: currentColor; }
 
@@ -378,6 +392,7 @@ a { color: inherit; }
     rgba(222, 242, 250, 0.8);
 }
 .say { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; min-height: 40px; }
+.hint b { color: var(--coral); font-weight: 700; }
 .hint { margin: 0; text-wrap: balance; font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .sum-bubble {
   position: absolute;
@@ -402,6 +417,42 @@ a { color: inherit; }
   .vs-strip { height: 54px; }
   .stat { padding: 4px 8px; }
 }
+
+/* ---------- 강화 카드 ---------- */
+.card-pick { max-width: 380px; }
+.card-pick .modal-note { margin: 4px 0 14px; }
+.card-list { display: grid; gap: 10px; }
+.pick-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 12px;
+  text-align: left;
+  border: var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.08s;
+  animation: deal 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+}
+.pick-card:nth-child(2) { animation-delay: 0.06s; }
+.pick-card:nth-child(3) { animation-delay: 0.12s; }
+@keyframes deal { from { transform: translateY(16px) scale(0.92); opacity: 0; } }
+.pick-card:active { transform: scale(0.97); }
+.pick-card:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; }
+.pick-card.k0 { background: var(--sky); }
+.pick-card.k1 { background: var(--butter); }
+.pick-card.k2 { background: var(--pink); }
+.pc-g { grid-row: 1 / 3; display: grid; place-items: center; width: 52px; height: 52px; background: var(--card); border: var(--line); border-radius: 10px; font-family: var(--num); font-weight: 700; font-size: 17px; white-space: nowrap; }
+.pc-g.sm { font-size: 14px; letter-spacing: -0.02em; }
+.pc-t { font-family: var(--head); font-size: 18px; line-height: 1.25; }
+.pc-d { font-size: 13px; line-height: 1.4; color: var(--ink); opacity: 0.75; }
+.pc-n { position: absolute; top: 8px; right: 10px; font-family: var(--num); font-weight: 700; font-size: 12px; }
+.my-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 4px; }
+.mc-k { width: 100%; font-size: 12px; font-weight: 700; color: var(--sub); }
+.mc-chip { padding: 3px 10px; background: var(--soft); border-radius: 99px; font-size: 13px; font-weight: 700; }
 
 /* ---------- 처음 보는 아이템 설명 ---------- */
 .coach { position: fixed; inset: 0; z-index: 55; }

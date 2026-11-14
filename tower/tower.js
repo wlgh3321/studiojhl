@@ -30,7 +30,25 @@
   const SLOW_DANGER = 1.5; // 위험할 때 줄이 이만큼 느리게 올라와요
   const FEVER_COMBO = 5;  // 콤보가 이만큼 이어지면 피버 타임
   const FEVER_SEC = 5;    // 피버 타임 길이(초): 점수 2배, 새 줄이 멈춰요
-  const iceRate = lv => (lv >= 6 ? 0.12 : lv >= 3 ? 0.08 : 0); // 얼음 블록이 섞이는 비율
+  // 강화 카드 (혼자·오늘의 탑에서 레벨이 오를 때마다 3장 중 1장)
+  // max: 같은 카드를 몇 번까지 고를 수 있는지
+  const CARDS = [
+    { id: 't15', g: '15', ko: ['합 15도 펑', '이은 합이 15여도 터져요.'], en: ['15 works too', 'Chains that add up to 15 pop too.'], max: 1 },
+    { id: 'long', g: '×2', ko: ['긴 연결', '3개 이상 이으면 점수 2배.'], en: ['Long chains', '3+ chains score double.'], max: 1 },
+    { id: 'even', g: '2·8', ko: ['짝수 보너스', '짝수끼리만 이으면 점수 2배.'], en: ['Even bonus', 'All-even chains score double.'], max: 1 },
+    { id: 'combo', g: '+1초', gen: '+1s', ko: ['콤보 연장', '콤보가 이어지는 시간 +1초.'], en: ['Longer combo', '+1s to keep a combo going.'], max: 2 },
+    { id: 'gauge', g: '⚡', ko: ['폭탄 충전', '폭탄 게이지가 2배 빨리 차요.'], en: ['Fast charge', 'The bomb gauge fills twice as fast.'], max: 1 },
+    { id: 'slow', g: '−15%', ko: ['느긋하게', '새 줄이 15% 늦게 올라와요.'], en: ['Slow down', 'Rows rise 15% slower.'], max: 3 },
+    { id: 'bombs', g: '●', ko: ['폭탄 풍년', '폭탄 블록이 3배 자주 나와요.'], en: ['Bomb rain', 'Bomb blocks show up 3× more.'], max: 1 },
+    { id: 'stars', g: '★', ko: ['별 풍년', '별 블록이 3배 자주 나와요.'], en: ['Star rain', 'Star blocks show up 3× more.'], max: 1 },
+    { id: 'noIce', g: '☀', ko: ['따뜻한 탑', '얼음 블록이 더 안 나와요.'], en: ['Warm tower', 'No more ice blocks.'], max: 1 },
+    { id: 'pop', g: '+0.6', ko: ['숨 돌리기', '터뜨릴 때 버는 시간이 2배.'], en: ['Breather', 'Popping buys twice the time.'], max: 1 },
+    { id: 'fever', g: '+3초', gen: '+3s', ko: ['피버 연장', '피버 타임이 3초 더 길어요.'], en: ['Long fever', 'Fever lasts 3s longer.'], max: 1 },
+    { id: 'shield', g: '◆', ko: ['방패', '꼭대기에 닿으면 한 번, 위 3줄이 사라져요.'], en: ['Shield', 'Once, when you hit the top, the top 3 rows vanish.'], max: 9 },
+  ];
+  let perk = {}; // 이번 판에서 고른 카드: { id: 고른 횟수 }
+  const has = id => perk[id] || 0;
+  const iceRate = lv => (has('noIce') ? 0 : lv >= 6 ? 0.12 : lv >= 3 ? 0.08 : 0); // 얼음 블록이 섞이는 비율
   const ICON = {
     star: '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="M8 1.6l1.9 4 4.4.6-3.2 3 .8 4.4L8 11.5l-3.9 2.1.8-4.4-3.2-3 4.4-.6z"/></svg>',
     bomb: '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M9.6 5.2c.4-1.6 1.4-2.6 3-2.8"/><circle cx="7.2" cy="9.6" r="5" fill="currentColor"/><circle cx="5.4" cy="7.8" r="1.3" fill="#fff" opacity=".85"/><circle cx="13.2" cy="2.2" r="1.2" fill="#ff6f6f"/></svg>',
@@ -90,6 +108,11 @@
       incoming: '공격 예고', cpu: '컴퓨터', you: '나', win: 'YOU WIN!', lose: 'YOU LOSE',
       oppLeft: '상대가 나갔어요', attack: '공격 +{n}', blocked: '방어!', offset: '상쇄 -{n}',
       vsPause: '온라인 대전은 멈출 수 없어요. 게임은 계속 진행돼요.', rematch: '한 판 더',
+      cardTitle: '카드를 한 장 골라요', myCards: '내 카드',
+      missionK: '미션', missionDone: '미션 성공!',
+      mDigit: '{d} 블록을 {k}개 터뜨려요', mChain3: '3개 이상 이어서 {k}번 터뜨려요', mChain4: '4개 이상 이어서 한 번 터뜨려요',
+      mCombo: '콤보를 ×{k}까지 이어요', mIce: '얼음을 {k}개 깨요', mBomb: '폭탄을 한 번 터뜨려요',
+      shockwave: '쾅! 주변까지 펑', shieldUsed: '방패가 막아 줬어요!',
       bomb: '폭탄', aimHint: '터뜨릴 곳을 눌러요', gotIt: '알겠어요',
       fever: 'FEVER! ×2', feverHint: '피버! 점수 2배',
       coStar: '별', coStarD: '모자란 숫자를 채워 줘요.<br>이은 합이 10보다 작아도 펑!',
@@ -140,6 +163,11 @@
       incoming: 'Incoming', cpu: 'CPU', you: 'You', win: 'YOU WIN!', lose: 'YOU LOSE',
       oppLeft: 'Your rival left', attack: 'Attack +{n}', blocked: 'Blocked!', offset: 'Cancel -{n}',
       vsPause: "Online matches can't be paused. The game keeps running.", rematch: 'Rematch',
+      cardTitle: 'Pick a card', myCards: 'My cards',
+      missionK: 'Mission', missionDone: 'Mission clear!',
+      mDigit: 'Pop {k} × {d}', mChain3: 'Pop 3+ chains {k} times', mChain4: 'Pop a 4+ chain',
+      mCombo: 'Reach combo ×{k}', mIce: 'Break {k} ice', mBomb: 'Set off a bomb',
+      shockwave: 'BOOM! Shockwave', shieldUsed: 'Shield saved you!',
       bomb: 'Bomb', aimHint: 'Tap where to blast', gotIt: 'Got it',
       fever: 'FEVER! ×2', feverHint: 'Fever! Double points',
       coStar: 'Star', coStarD: 'Fills in what is missing.<br>Pops even under 10!',
@@ -324,7 +352,7 @@
   const els = new Map(); // 칸 id → 화면 요소
 
   // 새 줄 간격(초): 레벨 1은 6.5초, 레벨마다 0.35초씩 빨라져서 레벨 11부터 3초.
-  const riseTime = lv => Math.max(3, 6.5 - 0.35 * (lv - 1));
+  const riseTime = lv => Math.max(3, 6.5 - 0.35 * (lv - 1)) * (1 + 0.15 * has('slow'));
   const levelOf = cleared => 1 + Math.floor(cleared / LEVEL_CLEAR);
 
   // 숫자 뽑기. 오늘의 탑은 날짜로 정해진 순서(mulberry32), 기본 모드는 그냥 무작위.
@@ -349,7 +377,9 @@
     const r = gen();
     const v = randNum(gen);
     let kind = 'n';
-    if (special) { if (r < P_BOMB) kind = 'bomb'; else if (r < P_BOMB + P_STAR) kind = 'star'; }
+    const pb = P_BOMB * (has('bombs') ? 3 : 1);
+    const ps = P_STAR * (has('stars') ? 3 : 1);
+    if (special) { if (r < pb) kind = 'bomb'; else if (r < pb + ps) kind = 'star'; }
     return { v: kind === 'n' ? v : 0, kind, id: ++idSeq, c, fresh: true };
   }
   // 새 줄 한 줄. 바로 옆끼리 합 10인 짝이 적어도 두 개 생기게 맞춰요(꽉 막힌 줄이 안 나오게).
@@ -383,7 +413,7 @@
   function newState() {
     return {
       cols: Array.from({ length: COLS }, () => []),
-      gauge: 0, aim: false, feverUntil: -1, coach: null,
+      gauge: 0, aim: false, feverUntil: -1, coach: null, mission: null, missionN: 0, carding: false, mood: '',
       score: 0, level: 1, pops: 0, cleared: 0, maxChain: 0, combo: 0, maxCombo: 0, lastPopAt: -99,
       lastActAt: 0, hint: null, tutorial: false, vs: null,
       riseMax: riseTime(1), riseIn: riseTime(1), elapsed: 0,
@@ -419,7 +449,8 @@
     const sum = pathSum();
     const n = S.path.length;
     if (pathHasStar()) return sum > 9 ? 'over' : (n >= 2 && sum >= 1 ? 'ok' : '');
-    return sum === 10 && n >= 2 ? 'ok' : sum > 10 ? 'over' : '';
+    if (n >= 2 && (sum === 10 || (sum === 15 && has('t15')))) return 'ok';
+    return sum > (has('t15') ? 15 : 10) ? 'over' : '';
   }
   function canExtend(cell) {
     if (!S.path.length || cell.kind === 'bomb' || cell.ice || S.path.includes(cell)) return false;
@@ -552,6 +583,17 @@
     renderHud();
   }
 
+  // 아래 안내 줄: 조준 → 피버 → 처음 안내 → 미션 → 기본 안내 순서로 보여 줘요.
+  function setHint() {
+    const h = $('hint');
+    if (!S) return;
+    if (S.aim) h.textContent = t('aimHint');
+    else if (S.feverUntil > 0 && S.elapsed < S.feverUntil) h.textContent = t('feverHint');
+    else if (S.tutorial) h.textContent = t('hintTut');
+    else if (S.mission) h.innerHTML = `<b>${t('missionK')} ${Math.min(S.mission.got, S.mission.k)}/${S.mission.k}</b><br>${missionText(S.mission)}`;
+    else h.textContent = t('hint');
+  }
+
   const inDanger = () => S.cols.some(col => col.length >= ROWS - 1);
 
   /* ---------- 폭탄 게이지 ---------- */
@@ -567,14 +609,14 @@
   function charge(n) {
     if (S.gauge >= GAUGE_MAX) return;
     // 한 번에 1칸, 콤보 ×3부터 +1, 4개 이상 이으면 +1
-    S.gauge = Math.min(GAUGE_MAX, S.gauge + 1 + (S.combo >= 3 ? 1 : 0) + (n >= 4 ? 1 : 0));
+    S.gauge = Math.min(GAUGE_MAX, S.gauge + (1 + (S.combo >= 3 ? 1 : 0) + (n >= 4 ? 1 : 0)) * (has('gauge') ? 2 : 1));
     if (S.gauge >= GAUGE_MAX) sfx.level();
   }
   function setAim(on) {
     S.aim = on;
     S.path = [];
     renderPath();
-    $('hint').textContent = on ? t('aimHint') : t(feverOn() ? 'feverHint' : S.tutorial ? 'hintTut' : 'hint');
+    setHint();
     renderGauge();
   }
   function bombBtn() {
@@ -905,38 +947,55 @@
   }
   const feverOn = () => S.elapsed < S.feverUntil;
   function startFever() {
-    S.feverUntil = S.elapsed + FEVER_SEC;
+    S.feverUntil = S.elapsed + FEVER_SEC + 3 * has('fever');
     $('board').classList.add('fever');
     punch();
     buzz([20, 40, 20]);
-    $('hint').textContent = t('feverHint');
+    setHint();
     sfx.level();
     later(() => fxCenter(t('fever')), 200);
   }
   function endFever() {
     S.feverUntil = -1;
     $('board').classList.remove('fever');
-    if (!S.aim) $('hint').textContent = t(S.tutorial ? 'hintTut' : 'hint');
+    setHint();
   }
 
   function popPath() {
     const path = S.path;
     const n = path.length;
     const usedStar = pathHasStar();
-    S.combo = S.elapsed - S.lastPopAt <= 3 ? S.combo + 1 : 1;
+    S.combo = S.elapsed - S.lastPopAt <= 3 + has('combo') ? S.combo + 1 : 1;
     S.lastPopAt = S.elapsed;
-    S.riseIn = Math.min(S.riseMax, S.riseIn + POP_BONUS);
+    S.riseIn = Math.min(S.riseMax, S.riseIn + POP_BONUS * (has('pop') ? 2 : 1));
     charge(n);
     if (S.combo % FEVER_COMBO === 0) startFever();
-    const mult = Math.min(S.combo, 5) * (feverOn() ? 2 : 1);
-    const pts = 5 * n * n * mult;
-    if (thaw(S.cols, path)) sfx.ice();
+    // 길게 이을수록 크게: 2개 10점, 3개 40점, 4개 100점, 5개 200점, 그 뒤로 +80점씩
+    const base = n <= 2 ? 10 : n === 3 ? 40 : n === 4 ? 100 : 200 + (n - 5) * 80;
+    const allEven = path.every(x => x.kind === 'n' && x.v % 2 === 0);
+    const mult = Math.min(S.combo, 5) * (feverOn() ? 2 : 1) * (has('long') && n >= 3 ? 2 : 1) * (has('even') && allEven ? 2 : 1);
+    const pts = base * mult;
+    // 4개 이상: 이은 칸 바로 옆(위·아래·왼쪽·오른쪽) 블록까지 같이 터져요.
+    const extra = [];
+    if (n >= 4) {
+      for (const cell of path) {
+        const c = cell.c, r = rowOf(cell);
+        for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const col = S.cols[c + dc];
+          const x = col && col[r + dr];
+          if (x && !path.includes(x) && !extra.includes(x)) extra.push(x);
+        }
+      }
+    }
+    missionNote('pop', path, n);
+    const thawed = thaw(S.cols, path);
+    if (thawed) { sfx.ice(); missionNote('ice', thawed); }
     S.score += pts;
     S.pops += 1;
     S.cleared += n;
     S.lastActAt = S.elapsed;
     clearHint();
-    if (S.tutorial) { S.tutorial = false; store.set(KEY.tut, '1'); $('hint').textContent = t('hint'); }
+    if (S.tutorial) { S.tutorial = false; store.set(KEY.tut, '1'); setHint(); }
     S.maxChain = Math.max(S.maxChain, n);
     S.maxCombo = Math.max(S.maxCombo, S.combo);
 
@@ -950,11 +1009,18 @@
     }
     const heavy = n >= 4;
     const cx = sx / n, cy = sy / n;
-    const pos = new Map(path.map(cell => [cell, [cell.c, rowOf(cell)]]));
+    const pos = new Map(path.concat(extra).map(cell => [cell, [cell.c, rowOf(cell)]]));
     boardRect = $('board').getBoundingClientRect();
+    if (extra.length) { thaw(S.cols, extra); S.score += extra.length * 10; S.cleared += extra.length; }
     // 큰 연결은 아주 잠깐 멈췄다가(히트 스톱) 터져요.
     const doPop = () => {
       for (const cell of path) shatter(cell, heavy ? 70 : 52, pos);
+      if (extra.length) {
+        for (const cell of extra) shatter(cell, 60, pos);
+        fxCenter(t('shockwave'));
+        shake('shake-l');
+        buzz([20, 30, 30]);
+      }
       fxAt(cx, cy, mult > 1 ? `+${pts} ×${mult}` : `+${pts}`, heavy || mult >= 3);
       if (S.combo >= 2) comboFx(cx, cy - 48, S.combo);
       sfx.pop(n, S.combo);
@@ -962,12 +1028,13 @@
       if (heavy) shake('shake-s');
       render();
     };
-    for (const cell of path) {
+    for (const cell of path.concat(extra)) {
       const col = S.cols[cell.c];
       col.splice(col.indexOf(cell), 1);
     }
     S.path = [];
     S.lastState = '';
+    mascot('happy');
     renderPath();
     if (heavy && !calm()) {
       for (const cell of path) { const el = els.get(cell.id); if (el) { el.classList.remove('sel', 'ok', 'over', 'tap'); el.classList.add('hit'); } }
@@ -977,7 +1044,7 @@
     if (n >= 5) { S.score += 200; later(() => fxCenter(t('longChain')), 250); }
     if (S.vs) {
       if (usedStar) vsShield();
-      vsAttack((S.combo % 3 === 0 ? 1 : 0) + (n >= 5 ? 1 : 0));
+      vsAttack((S.combo % 3 === 0 ? 1 : 0) + (n >= 4 ? 1 : 0) + (n >= 5 ? 1 : 0));
     }
     renderHud();
     later(ensureMoves, 320);
@@ -1001,7 +1068,10 @@
       if (c < 0 || c >= COLS) continue;
       for (let r = r0 - 1; r <= r0 + 1; r++) { const cell = S.cols[c][r]; if (cell) hitCells.push(cell); }
     }
-    thaw(S.cols, hitCells);
+    const thawedB = thaw(S.cols, hitCells);
+    if (thawedB) missionNote('ice', thawedB);
+    missionNote('bomb');
+    mascot('happy');
     const pts = hitCells.length * 10 * (feverOn() ? 2 : 1);
     S.score += pts;
     S.pops += 1;
@@ -1041,7 +1111,20 @@
       const r = $('upBtn').getBoundingClientRect();
       fxAt(r.left + r.width / 2, r.top, '+5');
     }
-    const ok = pushRow(true);
+    let ok = pushRow(true);
+    if (!ok && has('shield') && !S.vs) {
+      // 방패: 위 3줄을 날려서 한 번 살려 줘요.
+      perk.shield--;
+      const gone = [];
+      S.cols.forEach((col, c) => col.forEach((cell, r) => { if (r >= ROWS - 3) gone.push(cell); }));
+      const pos = new Map(gone.map(cell => [cell, [cell.c, rowOf(cell)]]));
+      boardRect = $('board').getBoundingClientRect();
+      for (const cell of gone) { shatter(cell, 80, pos); const col = S.cols[cell.c]; col.splice(col.indexOf(cell), 1); }
+      fxCenter(t('shieldUsed'));
+      sfx.boom();
+      shake('shake-l');
+      ok = true;
+    }
     S.riseMax = riseTime(S.level);
     S.riseIn = S.riseMax;
     sfx.rise();
@@ -1066,6 +1149,7 @@
         sfx.level();
         fxCenter(t('levelUp', { n: lv }));
         renderHud();
+        if (!S.vs) { openCards(); return void (raf = requestAnimationFrame(loop)); }
       }
       // 처음 하는 사람은 첫 조합을 터뜨릴 때까지 기다려 줘요. 꼭대기 가까이 차면 천천히 올라와요.
       if (S.feverUntil > 0 && !feverOn()) endFever();
@@ -1083,6 +1167,7 @@
       $('riseFill').parentElement.classList.toggle('hurry', S.riseIn < 1.5);
       $('riseFill').parentElement.classList.toggle('slow', inDanger());
       $('riseFill').parentElement.classList.toggle('fever', feverOn());
+      moodTick();
       if (!S.tutorial && !S.path.length && !S.aim && !S.dragging && (S.coachAt = (S.coachAt || 0) + dt) > 0.25) { S.coachAt = 0; coachCheck(); }
     }
     raf = requestAnimationFrame(loop);
@@ -1091,6 +1176,125 @@
   function clearTimers() {
     cancelAnimationFrame(raf);
     if (S) S.timers.forEach(clearTimeout);
+  }
+
+  /* ---------- 강화 카드 ---------- */
+  let cardRng = Math.random;
+  const cardName = c => (lang === 'en' ? c.en : c.ko);
+  function openCards() {
+    const pool = CARDS.filter(c => has(c.id) < c.max && !(c.id === 'noIce' && S.level < 2 && false));
+    const pick = [];
+    while (pick.length < 3 && pool.length) pick.push(pool.splice(Math.floor(cardRng() * pool.length), 1)[0]);
+    if (!pick.length) return;
+    S.running = false;
+    S.dragging = false;
+    S.carding = true;
+    if (S.aim) setAim(false);
+    S.path = [];
+    renderPath();
+    $('cardLevel').textContent = t('levelUp', { n: S.level });
+    const list = $('cardList');
+    list.innerHTML = '';
+    pick.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pick-card k' + (i % 3);
+      const [title, desc] = cardName(c);
+      const g = lang === 'en' && c.gen ? c.gen : c.g;
+      b.innerHTML = `<span class="pc-g${g.length >= 4 ? ' sm' : ''}">${g}</span><span class="pc-t">${title}</span><span class="pc-d">${desc}</span>${has(c.id) ? `<span class="pc-n">×${has(c.id) + 1}</span>` : ''}`;
+      b.addEventListener('click', () => chooseCard(c));
+      list.appendChild(b);
+    });
+    $('cardBox').hidden = false;
+    sfx.shuffle();
+  }
+  function chooseCard(c) {
+    if (!S || !S.carding) return;
+    perk[c.id] = has(c.id) + 1;
+    S.carding = false;
+    $('cardBox').hidden = true;
+    S.riseMax = riseTime(S.level);
+    S.riseIn = Math.min(S.riseIn, S.riseMax);
+    sfx.level();
+    if (!S.over) { S.running = true; lastTs = performance.now(); }
+    render();
+  }
+  function renderMyCards() {
+    const box = $('pauseCards');
+    const mine = CARDS.filter(c => has(c.id));
+    box.hidden = !mine.length;
+    if (!mine.length) return;
+    box.innerHTML = `<span class="mc-k">${t('myCards')}</span>` + mine.map(c => `<span class="mc-chip">${cardName(c)[0]}${has(c.id) > 1 ? ' ×' + has(c.id) : ''}</span>`).join('');
+  }
+
+  /* ---------- 미션 ---------- */
+  function makeMission() {
+    const r = Math.random;
+    const lv = S.level;
+    const types = ['digit', 'digit', 'chain3', 'combo'];
+    if (lv >= 2) types.push('chain4', 'bomb');
+    if (iceRate(lv) > 0) types.push('ice');
+    const type = types[Math.floor(r() * types.length)];
+    const m = { type, got: 0 };
+    if (type === 'digit') { m.d = 1 + Math.floor(r() * 9); m.k = 3 + Math.floor(r() * 3); }
+    else if (type === 'chain3') m.k = 2 + Math.floor(r() * 2);
+    else if (type === 'chain4') m.k = 1;
+    else if (type === 'combo') m.k = 3 + Math.floor(r() * 2);
+    else if (type === 'ice') m.k = 2 + Math.floor(r() * 2);
+    else m.k = 1;
+    S.missionN += 1;
+    return m;
+  }
+  function missionText(m) {
+    const key = { digit: 'mDigit', chain3: 'mChain3', chain4: 'mChain4', combo: 'mCombo', ice: 'mIce', bomb: 'mBomb' }[m.type];
+    return t(key, { d: m.d, k: m.k });
+  }
+  function missionNote(kind, a, n) {
+    const m = S && S.mission;
+    if (!m || S.vs) return;
+    if (kind === 'pop') {
+      if (m.type === 'digit') m.got += a.filter(x => x.kind === 'n' && x.v === m.d).length;
+      else if (m.type === 'chain3' && n >= 3) m.got += 1;
+      else if (m.type === 'chain4' && n >= 4) m.got += 1;
+      else if (m.type === 'combo') m.got = Math.max(m.got, S.combo);
+    } else if (kind === 'ice' && m.type === 'ice') m.got += a;
+    else if (kind === 'bomb' && m.type === 'bomb') m.got += 1;
+    if (m.got >= m.k) {
+      const reward = 150 + 50 * S.level;
+      S.score += reward;
+      S.gauge = Math.min(GAUGE_MAX, S.gauge + 6);
+      S.mission = null;
+      later(() => { fxCenter(t('missionDone') + ' +' + reward); sfx.win(); }, 350);
+      later(() => { if (S && !S.over) { S.mission = makeMission(); setHint(); } }, 2200);
+      renderGauge();
+    }
+    setHint();
+  }
+
+  /* ---------- 텐이(마스코트) ---------- */
+  let moodTimer = 0;
+  function mascot(m) {
+    const el = $('tenny');
+    if (!el || !S) return;
+    if (m === 'happy') {
+      clearTimeout(moodTimer);
+      S.mood = 'happy';
+      el.dataset.mood = 'happy';
+      el.classList.remove('hop');
+      void el.offsetWidth;
+      el.classList.add('hop');
+      moodTimer = setTimeout(() => { if (S) { S.mood = ''; moodTick(true); } }, 700);
+      return;
+    }
+    S.mood = m;
+    el.dataset.mood = m || 'idle';
+  }
+  function moodTick(force) {
+    if (!S || S.mood === 'happy' || S.mood === 'sad') return;
+    const top = Math.max(...S.cols.map(col => col.length));
+    const m = top >= ROWS - 1 ? 'panic' : top >= ROWS - 3 ? 'worry' : feverOn() ? 'happy-l' : 'idle';
+    const el = $('tenny');
+    if (force || el.dataset.mood !== m) el.dataset.mood = m;
   }
 
   function startGame(nextMode) {
@@ -1105,11 +1309,15 @@
     els.clear();
     show('game');
     layout();
+    perk = {};
+    cardRng = isDaily() ? seeded(Number(mode.replace(/\D/g, '')) ^ 0x5bd1e995) : Math.random;
     S = newState();
     for (let i = 0; i < START_ROWS; i++) pushRow(false);
+    if (!isVs()) S.mission = makeMission();
+    mascot('');
     S.tutorial = !isVs() && store.get(KEY.tut, '') !== '1';
     if (isVs()) vsBegin();
-    $('hint').textContent = t(S.tutorial ? 'hintTut' : 'hint');
+    setHint();
     $('link').setAttribute('d', '');
     lastHud = '';
     shownScore = 0;
@@ -1141,7 +1349,7 @@
     if (!coachLeft) return;
     coachLeft = COACH.some(k => !coachSeen(k));
     if (!coachLeft) return;
-    if (S.coach || (S.vs && S.vs.kind === 'net')) return; // 온라인 대전은 멈출 수 없어서 건너뛰어요
+    if (S.coach || S.carding || (S.vs && S.vs.kind === 'net')) return; // 온라인 대전은 멈출 수 없어서 건너뛰어요
     if (performance.now() - (S.drawnAt || 0) < 300) return; // 칸이 움직이는 중이면 멈춘 뒤에 보여 줘요
     for (const k of COACH) {
       if (coachSeen(k)) continue;
@@ -1212,7 +1420,7 @@
   }
 
   function pause() {
-    if (!S || S.over || S.coach) return;
+    if (!S || S.over || S.coach || S.carding) return;
     if (!S.running) {
       if (!S.paused) toTitle(); // 카운트다운 중에는 처음 화면으로
       return;
@@ -1222,6 +1430,7 @@
     if (!net) { S.running = false; S.dragging = false; } // 온라인 대전은 멈추지 않아요
     S.paused = true;
     $('pauseNote').textContent = t(net ? 'vsPause' : 'pauseNote');
+    renderMyCards();
     $('restartBtn').hidden = net;
     $('pauseBox').hidden = false;
   }
@@ -1241,6 +1450,7 @@
     $('overBox').hidden = true;
     $('countdown').hidden = true;
     $('coach').hidden = true;
+    $('cardBox').hidden = true;
     show('title');
     $('titleBest').textContent = Number(store.get(KEY.best, '0')) || 0;
     loadHof();
@@ -1251,6 +1461,7 @@
   });
 
   function gameOver() {
+    mascot('sad');
     if (S.vs) { vsEnd(false); return; }
     S.over = true;
     S.running = false;
@@ -1803,7 +2014,7 @@
     lang = lang === 'ko' ? 'en' : 'ko';
     store.set(KEY.lang, lang);
     applyLang();
-    if (S && !S.over) $('hint').textContent = t(S.tutorial ? 'hintTut' : 'hint');
+    if (S && !S.over) setHint();
     loadHof();
   });
 
@@ -1833,5 +2044,5 @@
   if (/^[A-Z0-9]{5}$/.test(invited)) vsOpen(invited);
 
   // 테스트용 (자동 검사에서만 써요)
-  window.__tower = { get state() { return S; }, get room() { return room; }, vsAttack, renderHof, popPath, rise, findMove, ensureMoves, explode, showHint, makeRow, renderGauge, coachCheck, coachDone };
+  window.__tower = { get state() { return S; }, get room() { return room; }, vsAttack, renderHof, popPath, rise, findMove, ensureMoves, explode, showHint, makeRow, renderGauge, coachCheck, coachDone, openCards, perk: () => perk, pathState };
 })();
