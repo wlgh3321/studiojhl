@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5f1">
+  <title>AI 비용 계산기 — API 토큰·구독·영상 단가로 월 비용 계산 · JHL STUDIO</title>
+  <meta name="description" content="GPT-6·Claude·Gemini API의 입력·출력 단가와 HeyGen·Synthesia·ElevenLabs 구독료로 월 예상 AI 비용을 계산해요. 같은 사용량을 모델별로 비교하고 원화 환산까지 바로 보여 줘요.">
+  <link rel="canonical" href="https://studiojhl.com/tools/ai-cost-calculator/">
+  <link rel="icon" href="/logo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="JHL STUDIO">
+  <meta property="og:title" content="AI 비용 계산기 — 한 달에 얼마 나갈까?">
+  <meta property="og:description" content="모델과 사용량을 넣으면 월 예상 AI 비용을 계산해요. 모델별 비교, 구독료, 영상·음성 사용료까지 한 번에.">
+  <meta property="og:url" content="https://studiojhl.com/tools/ai-cost-calculator/">
+  <meta property="og:image" content="https://studiojhl.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="/style.css?v=12">
+  <link rel="stylesheet" href="/tools/ai-cost-calculator/tool.css?v=1">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI 비용 계산기","alternateName":"AI API Cost Calculator","url":"https://studiojhl.com/tools/ai-cost-calculator/","applicationCategory":"BusinessApplication","operatingSystem":"Web","browserRequirements":"Requires JavaScript","inLanguage":["ko","en"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"JHL STUDIO","url":"https://studiojhl.com/"},"description":"OpenAI·Anthropic·Google의 토큰 단가와 구독 플랜, 영상·음성 사용료로 월 예상 AI 비용을 계산하는 무료 도구."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"JHL STUDIO","item":"https://studiojhl.com/"},{"@type":"ListItem","position":2,"name":"AI 비용 계산기","item":"https://studiojhl.com/tools/ai-cost-calculator/"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"AI API 비용은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"요청 수에 요청당 입력·출력 토큰을 곱해 월 토큰을 구하고, 100만 토큰당 단가를 곱해 더하면 됩니다. 출력 토큰 단가가 입력보다 4~5배 높은 모델이 많아서 답변 길이가 비용을 크게 좌우합니다."}},{"@type":"Question","name":"입력 토큰과 출력 토큰은 무엇이 다른가요?","acceptedAnswer":{"@type":"Answer","text":"입력 토큰은 모델에 보내는 지시문·대화 기록·자료이고, 출력 토큰은 모델이 만들어 내는 답변입니다. 보통 출력이 더 비싸고, 대화가 길어지면 이전 대화가 매번 입력으로 다시 들어가 비용이 늘어납니다."}},{"@type":"Question","name":"프롬프트 캐싱을 쓰면 얼마나 아껴지나요?","acceptedAnswer":{"@type":"Answer","text":"같은 지시문이나 자료를 반복해서 보낼 때 캐시에 저장해 두고 다시 읽는 방식입니다. 캐시로 읽은 입력은 보통 입력 단가의 5~10% 수준이라, 긴 시스템 프롬프트를 쓰는 서비스에서 절감 효과가 큽니다."}},{"@type":"Question","name":"배치 API는 얼마나 싼가요?","acceptedAnswer":{"@type":"Answer","text":"OpenAI·Anthropic·Google 모두 배치 처리를 쓰면 보통 절반 가격입니다. 대신 결과가 바로 오지 않고 보통 24시간 안에 처리되므로, 급하지 않은 대량 요약·분류 작업에 맞습니다."}},{"@type":"Question","name":"HeyGen이나 Synthesia는 왜 분당 요금이 없나요?","acceptedAnswer":{"@type":"Answer","text":"두 서비스는 사용한 분량을 크레딧으로 바꿔 차감하는 월 구독제입니다. 예를 들어 Synthesia는 1분 영상에 보통 1,000~2,000 크레딧이 들고, 플랜마다 주는 크레딧이 달라서 필요한 영상 분량으로 플랜을 골라야 합니다."}},{"@type":"Question","name":"계산한 원화 금액이 실제 청구서와 같나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 계산기는 입력한 환율로만 바꿔 보여 줍니다. 실제 결제에서는 카드 환율과 해외 결제 수수료, 부가세(VAT)가 붙어 조금 더 나올 수 있습니다."}}]}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6048734887508367" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="/" aria-label="JHL STUDIO 홈">
+    <img class="brand-mark" src="/logo-mark.svg" alt="" width="32" height="32">
+    <span class="brand-name">JHL STUDIO</span>
+  </a>
+  <div class="nav">
+    <a href="/"><span data-only="ko">홈</span><span data-only="en" hidden>Home</span></a>
+    <a href="/blog/"><span data-only="ko">글</span><span data-only="en" hidden>Blog</span></a>
+    <a href="https://sumsum.studiojhl.com/"><span data-only="ko">셈셈 놀이터</span><span data-only="en" hidden>SumSum Playground</span></a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" class="chip" data-set-lang="ko">한국어</button>
+      <button type="button" class="chip" data-set-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="crumbs" aria-label="위치">
+    <a href="/"><span data-only="ko">JHL STUDIO</span><span data-only="en" hidden>JHL STUDIO</span></a>
+    <span aria-hidden="true">/</span>
+    <span><span data-only="ko">도구</span><span data-only="en" hidden>Tools</span></span>
+    <span aria-hidden="true">/</span>
+    <span><span data-only="ko">AI 비용 계산기</span><span data-only="en" hidden>AI cost calculator</span></span>
+  </nav>
+
+  <div class="tool-head">
+    <span class="stage">Web tool · Free</span>
+    <h1>
+      <span data-only="ko">AI, 한 달에 <em>얼마</em> 나갈까?</span>
+      <span data-only="en" hidden>What will <em>AI</em> cost you a month?</span>
+    </h1>
+    <p class="lead">
+      <span data-only="ko">모델과 사용량을 넣으면 월 예상 비용을 바로 계산해요. 같은 사용량을 다른 모델로 돌리면 얼마인지 나란히 비교하고, 구독료와 영상·음성 사용료까지 한 번에 더해 드려요.</span>
+      <span data-only="en" hidden>Enter a model and your usage to see the monthly cost. Compare the same workload across models, then add subscriptions, video and voice to get one total.</span>
+    </p>
+    <div class="tool-meta">
+      <span class="tag"><span data-only="ko">회원가입 없음</span><span data-only="en" hidden>No sign-up</span></span>
+      <span class="tag"><span data-only="ko">2026-11-21 단가 확인</span><span data-only="en" hidden>Prices checked Nov 21, 2026</span></span>
+      <span class="tag"><span data-only="ko">원화 환산</span><span data-only="en" hidden>KRW conversion</span></span>
+    </div>
+  </div>
+
+  <section class="calc" aria-label="AI 비용 계산기">
+
+    <div class="calc-total">
+      <div class="total-top">
+        <div>
+          <span class="total-label"><span data-only="ko">월 예상 비용</span><span data-only="en" hidden>Estimated monthly cost</span></span>
+          <strong class="total-usd" id="totalUsd" aria-live="polite">$0</strong>
+          <span class="total-krw" id="totalKrw">₩0</span>
+        </div>
+        <ul class="total-parts">
+          <li><span data-only="ko">API</span><span data-only="en" hidden>API</span><b id="sumApi">$0</b></li>
+          <li><span data-only="ko">영상·음성</span><span data-only="en" hidden>Video &amp; voice</span><b id="sumMedia">$0</b></li>
+          <li><span data-only="ko">구독</span><span data-only="en" hidden>Subscriptions</span><b id="sumSub">$0</b></li>
+        </ul>
+      </div>
+      <div class="total-foot">
+        <label class="rate" for="rate">
+          <span>1 USD =</span>
+          <input id="rate" type="number" inputmode="decimal" min="500" max="3000" step="1" value="1331" aria-label="USD to KRW rate">
+          <span data-only="ko">원</span><span data-only="en" hidden>KRW</span>
+          <span data-only="ko">· 2026-11-20 기준 환율이에요. 직접 고쳐도 돼요.</span>
+          <span data-only="en" hidden>· rate from Nov 20, 2026. You can change it.</span>
+        </label>
+        <button type="button" class="btn ghost" id="copyBtn"><span data-only="ko">결과 복사</span><span data-only="en" hidden>Copy result</span></button>
+      </div>
+    </div>
+
+    <div class="calc-grid">
+
+      <section class="panel box" aria-labelledby="apiTitle">
+        <h2 id="apiTitle"><span class="stage">01</span><span data-only="ko">API 토큰 비용</span><span data-only="en" hidden>API token cost</span></h2>
+        <p class="panel-note"><span data-only="ko">채팅·요약·분류처럼 토큰으로 요금을 내는 API를 계산해요.</span><span data-only="en" hidden>For APIs billed by tokens: chat, summaries, classification.</span></p>
+
+        <div class="presets" role="group" aria-label="Examples">
+          <button type="button" class="preset" data-preset="chat"><span data-only="ko">상담 챗봇</span><span data-only="en" hidden>Support chatbot</span></button>
+          <button type="button" class="preset" data-preset="summary"><span data-only="ko">문서 요약</span><span data-only="en" hidden>Doc summaries</span></button>
+          <button type="button" class="preset" data-preset="agent"><span data-only="ko">코딩 에이전트</span><span data-only="en" hidden>Coding agent</span></button>
+        </div>
+
+        <label class="field" for="model">
+          <span data-only="ko">모델</span><span data-only="en" hidden>Model</span>
+          <select id="model"></select>
+        </label>
+
+        <div class="field-row two">
+          <label class="field" for="req">
+            <span data-only="ko">월 요청 수</span><span data-only="en" hidden>Requests per month</span>
+            <input id="req" type="number" inputmode="numeric" min="0" step="100" value="5000">
+          </label>
+          <label class="field" for="cached">
+            <span data-only="ko">캐시로 읽는 입력 비율 (%)</span><span data-only="en" hidden>Cached input share (%)</span>
+            <input id="cached" type="number" inputmode="numeric" min="0" max="100" step="5" value="0">
+          </label>
+        </div>
+        <div class="field-row two">
+          <label class="field" for="tin">
+            <span data-only="ko">요청당 입력 토큰</span><span data-only="en" hidden>Input tokens per request</span>
+            <input id="tin" type="number" inputmode="numeric" min="0" step="100" value="1200">
+          </label>
+          <label class="field" for="tout">
+            <span data-only="ko">요청당 출력 토큰</span><span data-only="en" hidden>Output tokens per request</span>
+            <input id="tout" type="number" inputmode="numeric" min="0" step="50" value="400">
+          </label>
+        </div>
+
+        <label class="check" for="batch">
+          <input id="batch" type="checkbox">
+          <span data-only="ko">배치 API로 돌리기 (보통 50% 할인)</span><span data-only="en" hidden>Run as batch (usually 50% off)</span>
+        </label>
+
+        <div class="result">
+          <span class="result-label"><span data-only="ko">이 모델로 낼 월 비용</span><span data-only="en" hidden>Monthly cost with this model</span></span>
+          <strong class="result-num" id="apiCost">$0</strong>
+          <span class="result-krw" id="apiKrw">₩0</span>
+          <span class="result-sub" id="apiPerReq"></span>
+        </div>
+
+        <p class="hint" id="hint" hidden></p>
+
+        <div class="table-wrap">
+          <table class="cmp">
+            <thead>
+              <tr>
+                <th scope="col"><span data-only="ko">모델</span><span data-only="en" hidden>Model</span></th>
+                <th scope="col"><span data-only="ko">입력 $/1M</span><span data-only="en" hidden>In $/1M</span></th>
+                <th scope="col"><span data-only="ko">출력 $/1M</span><span data-only="en" hidden>Out $/1M</span></th>
+                <th scope="col"><span data-only="ko">월 비용</span><span data-only="en" hidden>Per month</span></th>
+              </tr>
+            </thead>
+            <tbody id="cmpBody"></tbody>
+          </table>
+        </div>
+        <p class="panel-result-note"><span data-only="ko">위 사용량을 그대로 넣었을 때의 월 비용이에요. 싼 순서로 정렬했어요. 캐시에 저장하는 비용은 빼고 캐시에서 읽는 단가만 적용했어요. Gemini 4 Carbon·Argon은 2026-12-01부터 $4 / $20, Gemini 3.8 Flash는 2027-01-01부터 $1.50 / $7.50으로 올라요.</span><span data-only="en" hidden>Monthly cost for the usage above, cheapest first. Cache writes are not included, only the cache read rate. Gemini 4 Carbon and Argon rise to $4 / $20 on Dec 1, 2026; Gemini 3.8 Flash rises to $1.50 / $7.50 on Jan 1, 2027.</span></p>
+      </section>
+
+      <div class="col">
+        <section class="panel box" aria-labelledby="subTitle">
+          <h2 id="subTitle"><span class="stage">02</span><span data-only="ko">구독료</span><span data-only="en" hidden>Subscriptions</span></h2>
+          <p class="panel-note"><span data-only="ko">실제로 결제하는 플랜만 체크하고 인원 수를 넣어 주세요. 월 결제 가격이에요.</span><span data-only="en" hidden>Tick the plans you actually pay for and set the number of seats. Monthly billing prices.</span></p>
+
+          <div class="sub-group">
+            <span class="stage">Claude</span>
+            <div class="sub-row">
+              <input type="checkbox" id="s-claude-pro" class="sub-check" data-price="20">
+              <label for="s-claude-pro">Claude Pro</label>
+              <span class="sub-price">$20</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="Claude Pro seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-claude-max" class="sub-check" data-price="100">
+              <label for="s-claude-max">Claude Max</label>
+              <span class="sub-price">$100</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="Claude Max seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-claude-ultra" class="sub-check" data-price="200">
+              <label for="s-claude-ultra">Claude Ultra</label>
+              <span class="sub-price">$200</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="Claude Ultra seats">
+            </div>
+          </div>
+
+          <div class="sub-group">
+            <span class="stage">ChatGPT</span>
+            <div class="sub-row">
+              <input type="checkbox" id="s-pro100" class="sub-check" data-price="100">
+              <label for="s-pro100">ChatGPT Pro 100</label>
+              <span class="sub-price">$100</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="ChatGPT Pro 100 seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-pro200" class="sub-check" data-price="200">
+              <label for="s-pro200">ChatGPT Pro 200</label>
+              <span class="sub-price">$200</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="ChatGPT Pro 200 seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-pro500" class="sub-check" data-price="500">
+              <label for="s-pro500">ChatGPT Pro 500</label>
+              <span class="sub-price">$500</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="ChatGPT Pro 500 seats">
+            </div>
+          </div>
+
+          <div class="sub-group">
+            <span class="stage"><span data-only="ko">아바타 영상</span><span data-only="en" hidden>Avatar video</span></span>
+            <div class="sub-row">
+              <input type="checkbox" id="s-heygen-creator" class="sub-check" data-price="29">
+              <label for="s-heygen-creator">HeyGen Creator</label>
+              <span class="sub-price">$29</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="HeyGen Creator seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-heygen-pro" class="sub-check" data-price="49">
+              <label for="s-heygen-pro">HeyGen Pro</label>
+              <span class="sub-price">$49</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="HeyGen Pro seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-heygen-business" class="sub-check" data-price="149">
+              <label for="s-heygen-business">HeyGen Business</label>
+              <span class="sub-price">$149</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="HeyGen Business seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-synthesia-starter" class="sub-check" data-price="19">
+              <label for="s-synthesia-starter">Synthesia <span data-only="ko">기본</span><span data-only="en" hidden>Basic</span></label>
+              <span class="sub-price">$19</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="Synthesia starter seats">
+            </div>
+            <div class="sub-row">
+              <input type="checkbox" id="s-synthesia-business" class="sub-check" data-price="99">
+              <label for="s-synthesia-business">Synthesia Business</label>
+              <span class="sub-price">$99</span>
+              <input type="number" class="sub-seats" value="1" min="1" max="99" disabled aria-label="Synthesia Business seats">
+            </div>
+          </div>
+
+          <div class="result">
+            <span class="result-label"><span data-only="ko">구독 합계</span><span data-only="en" hidden>Subscriptions total</span></span>
+            <strong class="result-num" id="subCost">$0</strong>
+            <span class="result-krw" id="subKrw">₩0</span>
+          </div>
+        </section>
+
+        <section class="panel box" aria-labelledby="mediaTitle">
+          <h2 id="mediaTitle"><span class="stage">03</span><span data-only="ko">영상·음성</span><span data-only="en" hidden>Video &amp; voice</span></h2>
+          <p class="panel-note"><span data-only="ko">만들 영상 분량과 읽어 줄 글자 수로 사용료를 계산해요.</span><span data-only="en" hidden>Estimate usage fees from video minutes and characters of speech.</span></p>
+
+          <label class="field" for="videoMin">
+            <span data-only="ko">월 영상 분량 (분)</span><span data-only="en" hidden>Video minutes per month</span>
+            <input id="videoMin" type="number" inputmode="numeric" min="0" step="1" value="10">
+          </label>
+          <label class="field" for="videoQ">
+            <span data-only="ko">해상도</span><span data-only="en" hidden>Resolution</span>
+            <select id="videoQ">
+              <option value="360p">360p — $0.023/s</option>
+              <option value="720p" selected>720p — $0.07/s</option>
+              <option value="1080p">1080p — $0.104/s</option>
+              <option value="4k">4K — $0.209/s</option>
+            </select>
+          </label>
+          <div class="media-result">
+            <span data-only="ko">영상 생성</span><span data-only="en" hidden>Video generation</span>
+            <b id="videoCost">$0</b>
+            <span class="result-krw" id="videoKrw">₩0</span>
+          </div>
+          <p class="media-line"><span data-only="ko">Gemini Omni 1.2 Flash 영상 생성 단가 기준이에요.</span><span data-only="en" hidden>Based on Gemini Omni 1.2 Flash video generation rates.</span></p>
+
+          <hr class="divider">
+
+          <label class="field" for="chars">
+            <span data-only="ko">월 음성 글자 수</span><span data-only="en" hidden>Characters of speech per month</span>
+            <input id="chars" type="number" inputmode="numeric" min="0" step="1000" value="50000">
+          </label>
+          <div class="media-result">
+            <span data-only="ko">음성 합성</span><span data-only="en" hidden>Text to speech</span>
+            <b id="ttsCost">$0</b>
+            <span class="result-krw" id="ttsKrw">₩0</span>
+          </div>
+          <p class="media-line" id="ttsLine"></p>
+          <p class="media-line"><span data-only="ko">ElevenLabs 크레딧 기준(글자 1개 = 1크레딧). 무료 플랜은 상업적 사용이 안 돼요.</span><span data-only="en" hidden>ElevenLabs credits: 1 character = 1 credit. The free plan is not licensed for commercial use.</span></p>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <article class="doc tool-doc">
+    <div class="box post">
+      <div data-only="ko">
+        <h2>토큰 비용은 이렇게 계산해요</h2>
+        <p>AI API는 글자 수가 아니라 <b>토큰</b> 단위로 요금을 받아요. 가격표는 보통 100만 토큰(1M)당 달러로 적혀 있어서, 내 사용량을 100만으로 나눠 곱하면 월 비용이 나와요.</p>
+        <div class="eg">
+          <p>월 입력 토큰 = 요청 수 × 요청당 입력 토큰</p>
+          <p>월 출력 토큰 = 요청 수 × 요청당 출력 토큰</p>
+          <p>월 비용 = 입력 토큰 ÷ 1,000,000 × <b>입력 단가</b></p>
+          <p>　　　 + 출력 토큰 ÷ 1,000,000 × <b>출력 단가</b></p>
+        </div>
+        <p>출력 단가가 입력의 4~5배인 모델이 많아요. 같은 토큰이라도 답변 쪽에 돈이 더 든다는 뜻이라, 답변 길이를 줄이는 것만으로 비용이 꽤 달라져요. 대화가 길어질 때 이전 대화가 매번 입력으로 다시 들어가는 점도 기억해 두세요.</p>
+
+        <h2>요청 하나에 토큰이 얼마나 들어갈까</h2>
+        <p>처음 계산할 때 감이 안 잡히면 아래 범위에서 시작해 보세요. 실제 값은 프롬프트 길이에 따라 크게 달라져요.</p>
+        <table>
+          <thead><tr><th>쓰는 경우</th><th>입력 토큰</th><th>출력 토큰</th></tr></thead>
+          <tbody>
+            <tr><td>짧은 질문 한 번</td><td class="num">100~300</td><td class="num">200~500</td></tr>
+            <tr><td>고객 상담 한 건 (지침 + 대화)</td><td class="num">1,000~2,000</td><td class="num">200~400</td></tr>
+            <tr><td>문서 요약 (A4 2~3장)</td><td class="num">3,000~6,000</td><td class="num">300~800</td></tr>
+            <tr><td>코드 파일 하나 고치기</td><td class="num">5,000~20,000</td><td class="num">500~2,000</td></tr>
+            <tr><td>긴 보고서 분석 (A4 20장)</td><td class="num">25,000~50,000</td><td class="num">1,000~3,000</td></tr>
+          </tbody>
+        </table>
+        <p>같은 내용이라도 한국어는 영어보다 토큰이 1.3~2배 더 들어가는 편이고, 최근 모델은 토크나이저가 바뀌어 같은 글도 토큰 수가 30% 안팎 늘어날 수 있어요. 정확한 수치는 각 서비스의 토큰 계산기나 API 응답의 usage 값으로 확인하는 게 가장 정확해요.</p>
+
+        <h2>실제로 계산해 보면</h2>
+        <h3>1. 상담 챗봇 — 월 30,000건, 입력 1,000 / 출력 300</h3>
+        <p>입력 30M, 출력 9M 토큰이에요. 같은 일을 하는데 모델만 바꿔도 이만큼 차이가 나요.</p>
+        <table>
+          <thead><tr><th>모델</th><th>월 비용</th></tr></thead>
+          <tbody>
+            <tr><td>GPT-6.2 Sol</td><td class="num">$150</td></tr>
+            <tr><td>Gemini 3.8 Flash</td><td class="num">$56.25</td></tr>
+            <tr><td>GPT-6 Luna</td><td class="num">$7.50</td></tr>
+          </tbody>
+        </table>
+        <p>정확도가 중요한 문의에만 비싼 모델을 쓰고, 단순 안내는 싼 모델로 나누면 같은 서비스도 비용이 크게 줄어요.</p>
+
+        <h3>2. 문서 요약 배치 — 월 5,000건, 입력 8,000 / 출력 800</h3>
+        <p>입력 40M, 출력 4M 토큰이에요. Claude Haiku 5.5로는 월 $6, 배치 API(50% 할인)로 돌리면 $3이에요. 급하지 않은 대량 작업은 배치가 거의 항상 유리해요.</p>
+
+        <h3>3. 영상 생성 — 월 60분, 720p</h3>
+        <p>3,600초 × $0.07 = 월 $252예요. 같은 분량을 1080p로 만들면 $374.40까지 올라가요. 아바타 영상(HeyGen·Synthesia)은 분당 요금 대신 크레딧을 차감하니, 02 구독료에서 플랜으로 계산하세요.</p>
+
+        <h3>4. 음성 합성 — 월 20만 자</h3>
+        <p>ElevenLabs 기준으로 20만 크레딧이 필요해요. Creator(121,000)로는 모자라고 Pro(600,000, $99)가 맞아요.</p>
+
+        <h2>비용을 줄이는 6가지</h2>
+        <ol>
+          <li><b>모델을 용도별로 나누기.</b> 분류·요약은 싼 모델, 판단이 어려운 일만 비싼 모델로 보내요.</li>
+          <li><b>프롬프트 캐싱 쓰기.</b> 같은 지시문·자료를 반복해 보낸다면 캐시로 읽는 입력이 보통 입력 단가의 5~10%예요.</li>
+          <li><b>배치 API 쓰기.</b> 급하지 않은 작업은 절반 가격이에요.</li>
+          <li><b>답변 길이 제한하기.</b> max tokens를 정해 두면 출력 비용이 새지 않아요.</li>
+          <li><b>긴 대화는 요약해서 다시 넣기.</b> 대화가 길어질수록 입력 토큰이 계속 늘어나요.</li>
+          <li><b>사용량 알림 걸기.</b> 결제 한도와 알림을 먼저 설정해 두면 사고를 막을 수 있어요.</li>
+        </ol>
+
+        <h2>자주 묻는 질문</h2>
+        <div class="faq">
+          <h3>AI API 비용은 어떻게 계산하나요?</h3>
+          <p>요청 수에 요청당 입력·출력 토큰을 곱해 월 토큰을 구하고, 100만 토큰당 단가를 곱해 더하면 돼요. 출력 단가가 입력보다 4~5배 높은 모델이 많아서 답변 길이가 비용을 크게 좌우해요.</p>
+          <h3>입력 토큰과 출력 토큰은 무엇이 다른가요?</h3>
+          <p>입력 토큰은 모델에 보내는 지시문·대화 기록·자료이고, 출력 토큰은 모델이 만들어 내는 답변이에요. 보통 출력이 더 비싸고, 대화가 길어지면 이전 대화가 매번 입력으로 다시 들어가 비용이 늘어나요.</p>
+          <h3>프롬프트 캐싱을 쓰면 얼마나 아껴지나요?</h3>
+          <p>같은 지시문이나 자료를 반복해서 보낼 때 캐시에 저장해 두고 다시 읽는 방식이에요. 캐시로 읽은 입력은 보통 입력 단가의 5~10% 수준이라, 긴 시스템 프롬프트를 쓰는 서비스에서 절감 효과가 커요.</p>
+          <h3>배치 API는 얼마나 싼가요?</h3>
+          <p>OpenAI·Anthropic·Google 모두 배치 처리를 쓰면 보통 절반 가격이에요. 대신 결과가 바로 오지 않고 보통 24시간 안에 처리되므로, 급하지 않은 대량 요약·분류 작업에 맞아요.</p>
+          <h3>HeyGen이나 Synthesia는 왜 분당 요금이 없나요?</h3>
+          <p>두 서비스는 사용한 분량을 크레딧으로 바꿔 차감하는 월 구독제예요. 예를 들어 Synthesia는 1분 영상에 보통 1,000~2,000 크레딧이 들고, 플랜마다 주는 크레딧이 달라서 필요한 영상 분량으로 플랜을 골라야 해요.</p>
+          <h3>계산한 원화 금액이 실제 청구서와 같나요?</h3>
+          <p>아니요. 계산기는 입력한 환율로만 바꿔 보여 줘요. 실제 결제에서는 카드 환율과 해외 결제 수수료, 부가세(VAT)가 붙어 조금 더 나올 수 있어요.</p>
+          <h3>어떤 모델이 가장 싼가요?</h3>
+          <p>용도에 따라 달라요. 짧은 분류·요약은 GPT-6 Luna나 Gemini 3.5 Flash-Lite, 긴 문서는 Gemini 3.8 Flash나 Claude Haiku 5.5가 저렴한 편이에요. 위 계산기에 같은 사용량을 넣고 모델만 바꿔 보면 바로 비교돼요.</p>
+        </div>
+
+        <h2>출처</h2>
+        <ul class="src">
+          <li>OpenAI API 단가 — <a href="https://platform.openai.com/docs/pricing" rel="noopener">platform.openai.com/docs/pricing</a></li>
+          <li>Anthropic API 단가 — <a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener">platform.claude.com/docs/…/pricing</a></li>
+          <li>Gemini API 단가 — <a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener">ai.google.dev/gemini-api/docs/pricing</a></li>
+          <li>Claude 구독 플랜 — <a href="https://www.anthropic.com/pricing" rel="noopener">anthropic.com/pricing</a></li>
+          <li>ChatGPT Pro 플랜 — <a href="https://help.openai.com/en/articles/9793128" rel="noopener">help.openai.com</a></li>
+          <li>HeyGen — <a href="https://www.heygen.com/pricing" rel="noopener">heygen.com/pricing</a></li>
+          <li>Synthesia — <a href="https://www.synthesia.io/pricing" rel="noopener">synthesia.io/pricing</a></li>
+          <li>ElevenLabs — <a href="https://elevenlabs.io/pricing" rel="noopener">elevenlabs.io/pricing</a></li>
+        </ul>
+        <p class="src">단가와 플랜은 2026년 11월 21일에 확인했어요. 서비스마다 예고 없이 바뀔 수 있으니 결제 전에 공식 가격 페이지를 한 번 더 확인해 주세요. 계산 결과는 예상치이고, 실제 청구 금액은 다를 수 있어요.</p>
+
+        <div class="cta">
+          <p>새 AI 도구를 고르는 기준과 가격 소식은 NextTool Lab에 정리하고 있어요.</p>
+          <div class="cta-links">
+            <a class="btn" href="https://nexttoollab-ai.blogspot.com/" rel="noopener">NextTool Lab 가기</a>
+            <a class="btn ghost" href="/blog/">JHL STUDIO 글 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div data-only="en" hidden>
+        <h2>How the token maths works</h2>
+        <p>AI APIs bill by <b>tokens</b>, not characters. Price lists show dollars per million tokens (1M), so divide your usage by a million and multiply by the rate.</p>
+        <div class="eg">
+          <p>Monthly input tokens = requests × input tokens per request</p>
+          <p>Monthly output tokens = requests × output tokens per request</p>
+          <p>Monthly cost = input ÷ 1,000,000 × <b>input rate</b> + output ÷ 1,000,000 × <b>output rate</b></p>
+        </div>
+        <p>Output usually costs 4–5× more than input, so answer length moves the bill a lot. Long conversations also resend earlier turns as input on every call.</p>
+
+        <h2>Rough token counts per request</h2>
+        <table>
+          <thead><tr><th>Task</th><th>Input tokens</th><th>Output tokens</th></tr></thead>
+          <tbody>
+            <tr><td>One short question</td><td class="num">100–300</td><td class="num">200–500</td></tr>
+            <tr><td>One support ticket (policy + thread)</td><td class="num">1,000–2,000</td><td class="num">200–400</td></tr>
+            <tr><td>Summarise a 2–3 page document</td><td class="num">3,000–6,000</td><td class="num">300–800</td></tr>
+            <tr><td>Fix one code file</td><td class="num">5,000–20,000</td><td class="num">500–2,000</td></tr>
+            <tr><td>Analyse a 20 page report</td><td class="num">25,000–50,000</td><td class="num">1,000–3,000</td></tr>
+          </tbody>
+        </table>
+        <p>Korean text usually costs 1.3–2× the tokens of the same English text, and newer tokenizers can add around 30% more tokens for the same text. For exact numbers, use each provider's tokenizer or the usage field in the API response.</p>
+
+        <h2>Worked examples</h2>
+        <h3>1. Support chatbot — 30,000 requests, 1,000 in / 300 out</h3>
+        <p>That is 30M input and 9M output tokens. GPT-6.2 Sol comes to $150 a month, Gemini 3.8 Flash to $56.25, and GPT-6 Luna to $7.50. Routing simple questions to a cheaper model is the biggest saving most teams can make.</p>
+        <h3>2. Batch summaries — 5,000 requests, 8,000 in / 800 out</h3>
+        <p>40M input and 4M output. Claude Haiku 5.5 costs $6, or $3 with the 50% batch discount. Anything that can wait belongs in batch.</p>
+        <h3>3. Video — 60 minutes at 720p</h3>
+        <p>3,600 seconds × $0.07 = $252. At 1080p the same footage is $374.40. Avatar tools such as HeyGen and Synthesia use credits instead, so price those in the subscription panel.</p>
+        <h3>4. Voice — 200,000 characters</h3>
+        <p>That needs 200,000 ElevenLabs credits: Creator (121,000) is not enough, Pro (600,000, $99) is.</p>
+
+        <h2>Six ways to cut the bill</h2>
+        <ol>
+          <li><b>Split by task.</b> Cheap models for classification and summaries, expensive ones only where judgement matters.</li>
+          <li><b>Use prompt caching.</b> Repeated instructions and documents are read back at roughly 5–10% of the input rate.</li>
+          <li><b>Use batch APIs.</b> Half price when you can wait.</li>
+          <li><b>Cap the output.</b> A max-token limit stops output spend from drifting.</li>
+          <li><b>Summarise long threads.</b> Every extra turn keeps being billed as input.</li>
+          <li><b>Set spend alerts.</b> A billing limit before launch beats a surprise invoice.</li>
+        </ol>
+
+        <h2>FAQ</h2>
+        <div class="faq">
+          <h3>How is AI API cost calculated?</h3>
+          <p>Multiply requests by input and output tokens to get monthly tokens, then apply the per-million rates and add them. Output rates are usually 4–5× input, so answer length matters most.</p>
+          <h3>Input vs output tokens?</h3>
+          <p>Input is what you send — instructions, history, documents. Output is what the model writes. Output is pricier, and long chats re-send history as input every turn.</p>
+          <h3>How much does prompt caching save?</h3>
+          <p>Cached input is typically read at 5–10% of the normal input rate, which is a large saving for long system prompts.</p>
+          <h3>How cheap is batch?</h3>
+          <p>OpenAI, Anthropic and Google all charge about half for batch work, usually returned within 24 hours.</p>
+          <h3>Why no per-minute price for HeyGen or Synthesia?</h3>
+          <p>They sell monthly credit plans. Synthesia typically uses 1,000–2,000 credits per minute of video, so pick the plan by the minutes you need.</p>
+          <h3>Is the KRW figure my actual bill?</h3>
+          <p>No. It is a conversion at the rate you enter. Card FX spreads, overseas fees and VAT can make the real charge higher.</p>
+        </div>
+
+        <h2>Sources</h2>
+        <ul class="src">
+          <li>OpenAI API pricing — <a href="https://platform.openai.com/docs/pricing" rel="noopener">platform.openai.com/docs/pricing</a></li>
+          <li>Anthropic API pricing — <a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener">platform.claude.com</a></li>
+          <li>Gemini API pricing — <a href="https://ai.google.dev/gemini-api/docs/pricing" rel="noopener">ai.google.dev/gemini-api/docs/pricing</a></li>
+          <li>Claude plans — <a href="https://www.anthropic.com/pricing" rel="noopener">anthropic.com/pricing</a></li>
+          <li>ChatGPT Pro plans — <a href="https://help.openai.com/en/articles/9793128" rel="noopener">help.openai.com</a></li>
+          <li>HeyGen — <a href="https://www.heygen.com/pricing" rel="noopener">heygen.com/pricing</a></li>
+          <li>Synthesia — <a href="https://www.synthesia.io/pricing" rel="noopener">synthesia.io/pricing</a></li>
+          <li>ElevenLabs — <a href="https://elevenlabs.io/pricing" rel="noopener">elevenlabs.io/pricing</a></li>
+        </ul>
+        <p class="src">Prices and plans checked on 21 November 2026. They change without notice, so confirm on the official pricing page before you pay. Results here are estimates.</p>
+
+        <div class="cta">
+          <p>Buying guides and price news for AI tools are collected on NextTool Lab.</p>
+          <div class="cta-links">
+            <a class="btn" href="https://nexttoollab-ai.blogspot.com/" rel="noopener">Visit NextTool Lab</a>
+            <a class="btn ghost" href="/blog/">Read the JHL STUDIO blog</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</main>
+
+<footer class="wrap foot">
+  <span>© 2026 JHL STUDIO</span>
+  <nav>
+    <a href="/tools/ai-cost-calculator/"><span data-only="ko">도구</span><span data-only="en" hidden>Tools</span></a>
+    <a href="/blog/"><span data-only="ko">글</span><span data-only="en" hidden>Blog</span></a>
+    <a href="/privacy.html"><span data-only="ko">개인정보처리방침</span><span data-only="en" hidden>Privacy</span></a>
+    <a href="https://sumsum.studiojhl.com/"><span data-only="ko">셈셈 놀이터</span><span data-only="en" hidden>SumSum Playground</span></a>
+  </nav>
+</footer>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="/site.js?v=4"></script>
+<script src="/tools/ai-cost-calculator/tool.js?v=1"></script>
+</body>
+</html>

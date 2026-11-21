@@ -1,0 +1,141 @@
+/* JHL STUDIO — AI 비용 계산기 (도구 페이지 전용) */
+
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding-top: 20px; font-size: 14px; color: var(--faint); }
+.crumbs a { color: var(--dim); font-weight: 600; text-decoration: none; }
+.crumbs a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+.tool-head { padding: 14px 0 26px; }
+.tool-head h1 { margin: 10px 0 14px; font-size: clamp(32px, 5.6vw, 52px); line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; }
+.tool-head h1 em { font-style: normal; color: var(--accent); }
+.tool-head .lead { margin: 0; max-width: 46em; color: var(--dim); font-size: clamp(16px, 2.1vw, 19px); }
+.tool-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+
+/* ---------- 계산기 ---------- */
+.calc { display: grid; gap: 16px; padding-bottom: 16px; }
+
+.calc-total {
+  display: grid; gap: 16px;
+  padding: 24px;
+  background: var(--ink); border-color: var(--ink); color: #fff;
+  border-radius: var(--radius);
+}
+.total-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; }
+.total-label { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.62); }
+.total-usd { display: block; font-size: clamp(34px, 6vw, 48px); font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; }
+.total-krw { font-size: 16px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+.total-parts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+.total-parts li { display: flex; align-items: baseline; gap: 6px; }
+.total-parts b { font-family: var(--mono); font-size: 14px; font-weight: 600; color: #fff; }
+.total-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.rate { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; color: rgba(255, 255, 255, 0.72); }
+.rate input {
+  width: 84px; min-height: 36px; padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.24); border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08); color: #fff;
+  font: inherit; font-size: 15px; font-weight: 600; text-align: right;
+}
+.rate input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.calc-total .btn { min-height: 40px; padding: 8px 18px; font-size: 14px; background: #fff; color: var(--ink); border-color: #fff; }
+.calc-total .btn:hover { background: #ecebe6; }
+
+.calc-grid { display: grid; gap: 16px; }
+@media (min-width: 920px) { .calc-grid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); align-items: start; } }
+.col { display: grid; gap: 16px; }
+
+.panel { padding: 22px; }
+.panel h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; font-size: 19px; font-weight: 800; }
+.panel h2 .stage { font-size: 11px; }
+.panel-note { margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: var(--faint); }
+.panel-result-note { margin: 10px 0 0; font-size: 13px; line-height: 1.6; color: var(--faint); }
+
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.preset {
+  padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px;
+  background: #fff; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.preset:hover { border-color: var(--ink); color: var(--ink); }
+
+.field { display: grid; gap: 5px; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--dim); }
+.field input, .field select {
+  width: 100%; min-height: 44px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink);
+  font: inherit; font-size: 16px; font-weight: 600;
+}
+.field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.field small { font-size: 12px; font-weight: 500; color: var(--faint); }
+.field-row { display: grid; gap: 10px; }
+@media (min-width: 560px) { .field-row.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (min-width: 700px) { .field-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.check { display: flex; align-items: center; gap: 8px; margin: 4px 0 14px; font-size: 14px; font-weight: 600; color: var(--dim); cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+.result { margin: 14px 0 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.result-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.result-num { display: block; margin-top: 2px; font-family: var(--mono); font-size: clamp(26px, 4vw, 32px); font-weight: 700; letter-spacing: -0.02em; color: var(--accent-ink); }
+.result-krw { font-size: 14px; font-weight: 600; color: var(--faint); }
+.result-sub { display: block; margin-top: 4px; font-size: 13px; color: var(--faint); }
+
+.hint { margin: 10px 0 0; padding: 9px 12px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: #fff6f4; font-size: 14px; line-height: 1.6; color: var(--dim); }
+.hint[hidden] { display: none !important; }
+
+.table-wrap { margin-top: 16px; max-height: 320px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
+.cmp { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cmp th, .cmp td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.cmp th { position: sticky; top: 0; z-index: 1; background: var(--bg); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
+.cmp th:first-child, .cmp td:first-child { text-align: left; }
+.cmp td:first-child { white-space: normal; }
+.cmp tbody tr:last-child td { border-bottom: 0; }
+.cmp tbody tr.is-picked { background: #fff1ee; box-shadow: inset 3px 0 0 var(--accent); }
+.cmp .vendor { display: block; font-size: 11px; font-weight: 600; color: var(--faint); }
+.cmp .cost { font-family: var(--mono); font-weight: 600; }
+.cmp .cheap { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; color: #0b7a4b; }
+
+/* ---------- 구독 ---------- */
+.sub-group { margin-top: 14px; }
+.sub-group:first-of-type { margin-top: 8px; }
+.sub-group > .stage { display: block; margin-bottom: 2px; font-size: 11px; }
+.sub-row {
+  display: grid; grid-template-columns: 20px minmax(0, 1fr) 62px 52px;
+  align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14px;
+}
+.sub-row:last-child { border-bottom: 0; }
+.sub-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); }
+.sub-row label { font-weight: 600; color: var(--ink); cursor: pointer; }
+.sub-price { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--faint); text-align: right; }
+.sub-seats {
+  width: 100%; min-height: 32px; padding: 3px 4px;
+  border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  font: inherit; font-size: 14px; text-align: center; color: var(--ink);
+}
+.sub-seats:disabled { opacity: 0.35; }
+
+/* ---------- 영상·음성 ---------- */
+.divider { margin: 18px 0; border: 0; border-top: 1px solid var(--line); }
+.media-result { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 8px; font-size: 15px; color: var(--dim); }
+.media-result b { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--accent-ink); }
+.media-line { margin: 6px 0 0; font-size: 14px; line-height: 1.6; color: var(--dim); }
+.media-line b { color: var(--ink); font-weight: 700; }
+
+/* ---------- 본문 ---------- */
+.tool-doc { padding-top: 36px; }
+.tool-doc .box { padding: clamp(22px, 4.6vw, 40px); }
+.tool-doc h2 { margin: 38px 0 12px; font-size: clamp(22px, 3vw, 26px); }
+.tool-doc h2:first-of-type { margin-top: 0; }
+.tool-doc h3 { margin: 22px 0 8px; font-size: 18px; }
+.tool-doc p { margin: 0 0 14px; }
+.tool-doc ul, .tool-doc ol { margin: 0 0 16px; padding-left: 1.3em; }
+.tool-doc li { margin-bottom: 7px; }
+.tool-doc .eg { margin: 14px 0 18px; }
+.tool-doc table { width: 100%; border-collapse: collapse; margin: 6px 0 18px; font-size: 15px; }
+.tool-doc th, .tool-doc td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+.tool-doc th { font-size: 13px; font-weight: 700; color: var(--faint); }
+.tool-doc td.num { font-family: var(--mono); }
+.tool-doc .src { font-size: 14px; color: var(--dim); }
+.tool-doc .src li { margin-bottom: 5px; }
+.faq h3 { margin-bottom: 6px; }
+.faq p { margin-bottom: 18px; color: var(--dim); }
+.cta-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.cta .btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.4); }
+.cta .btn.ghost:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
